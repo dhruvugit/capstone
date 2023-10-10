@@ -1,9 +1,12 @@
 package capstone.hackathon.capstone.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -11,28 +14,42 @@ import jakarta.persistence.Table;
 public class Team {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private long teamId;
 	private String teamName;
 	private long leaderId;
 	
+	@OneToOne(cascade = CascadeType.ALL)
+	 @JoinColumn(name = "id", referencedColumnName = "implementationId")
+	 private Implementation implementation;
+	
+	public Implementation getImplementation() {
+		return implementation;
+	}
+	public void setImplementation(Implementation implementation) {
+		this.implementation = implementation;
+	}
 	public Team() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public Team(String teamName, long leaderId) {
-		super();
-		this.teamName = teamName;
-		this.leaderId = leaderId;
-	}
+	
 	@Override
 	public String toString() {
-		return "Team [id=" + id + ", teamName=" + teamName + ", leaderId=" + leaderId + "]";
+		return "Team [id=" + teamId + ", teamName=" + teamName + ", leaderId=" + leaderId + ", implementation="
+				+ implementation + "]";
+	}
+	public Team(long id, String teamName, long leaderId, Implementation implementation) {
+		super();
+		this.teamId = id;
+		this.teamName = teamName;
+		this.leaderId = leaderId;
+		this.implementation = implementation;
 	}
 	public long getId() {
-		return id;
+		return teamId;
 	}
 	public void setId(long id) {
-		this.id = id;
+		this.teamId = id;
 	}
 	public String getTeamName() {
 		return teamName;
