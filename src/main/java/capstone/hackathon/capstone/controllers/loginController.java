@@ -1,17 +1,11 @@
 package capstone.hackathon.capstone.controllers;
-import capstone.hackathon.capstone.web.dto.LoginResponseDto;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import capstone.hackathon.capstone.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,16 +36,20 @@ public class loginController {
 	//@PreAuthorize("hasAuthority('Role_User') or hasAuthority('Role_Admin') or hasAuthority('Role_Judge') or hasAuthority('Role_Panelist')")
 
 	@PostMapping("/login")
-	public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-		if (authentication.isAuthenticated()) {
+	public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequest) {
+		User user = userService.findByUsername(loginRequest.getUsername());
+		if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+
+			// Authentication successful, generate and return a token
 			String token = jwtService.generateToken(loginRequest.getUsername());
-			LoginResponseDto responseDto = new LoginResponseDto("Login successful!", token);
-			return ResponseEntity.ok(responseDto);
-		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponseDto("Invalid username or password", null));
+			return ResponseEntity.ok(token);
 		}
+		else {
+			// Authentication failed
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+		}
+
 	}
 
 	@PostMapping("/resetPassword")
