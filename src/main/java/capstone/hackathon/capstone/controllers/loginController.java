@@ -1,4 +1,5 @@
 package capstone.hackathon.capstone.controllers;
+import capstone.hackathon.capstone.web.dto.LoginResponseDto;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,7 +24,7 @@ import capstone.hackathon.capstone.web.dto.ResetPasswordDto;
 
 import org.springframework.web.bind.annotation.RequestBody;
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/auth")
 public class loginController {
 	@Autowired
     private UserService userService;
@@ -39,21 +40,20 @@ public class loginController {
 
 
 	//@PreAuthorize("hasAuthority('Role_User') or hasAuthority('Role_Admin') or hasAuthority('Role_Judge') or hasAuthority('Role_Panelist')")
-	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequest) {
-		User user = userService.findByUsername(loginRequest.getUsername());
 
-		if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-			// Authentication successful
-			return ResponseEntity.ok("Login successful!");
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+		if (authentication.isAuthenticated()) {
+			String token = jwtService.generateToken(loginRequest.getUsername());
+			LoginResponseDto responseDto = new LoginResponseDto("Login successful!", token);
+			return ResponseEntity.ok(responseDto);
 		} else {
-			// Authentication failed
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponseDto("Invalid username or password", null));
 		}
 	}
 
-
-	//@PreAuthorize("hasAuthority('Role_User') or hasAuthority('Role_Admin') or hasAuthority('Role_Judge') or hasAuthority('Role_Panelist')")
 	@PostMapping("/resetPassword")
 	public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto)
 	{
@@ -67,18 +67,39 @@ public class loginController {
 	}
 
 
-	@PostMapping("/authenticate")
-	public String authenticateAndGetToken(@RequestBody LoginRequestDto loginRequestDto) {
 
 
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword()));
-		if (authentication.isAuthenticated()) {
-			return jwtService.generateToken(loginRequestDto.getUsername());
-		} else {
-			throw new UsernameNotFoundException("invalid user request !");
-		}
 
-	}
+//	@PostMapping("/login")
+//	public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequest) {
+//		User user = userService.findByUsername(loginRequest.getUsername());
+//
+//		if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+//			// Authentication successful
+//			return ResponseEntity.ok("Login successful!");
+//		} else {
+//			// Authentication failed
+//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+//		}
+//	}
+
+
+	//@PreAuthorize("hasAuthority('Role_User') or hasAuthority('Role_Admin') or hasAuthority('Role_Judge') or hasAuthority('Role_Panelist')")
+
+
+
+//	@PostMapping("/authenticate")
+//	public String authenticateAndGetToken(@RequestBody LoginRequestDto loginRequestDto) {
+//
+//
+//		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword()));
+//		if (authentication.isAuthenticated()) {
+//			return jwtService.generateToken(loginRequestDto.getUsername());
+//		} else {
+//			throw new UsernameNotFoundException("invalid user request !");
+//		}
+//
+//	}
 
 
 	
