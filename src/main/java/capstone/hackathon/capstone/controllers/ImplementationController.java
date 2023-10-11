@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,18 +28,19 @@ import capstone.hackathon.capstone.service.IfImplementationService;
 public class ImplementationController {
 		
 	@Autowired IfImplementationService implementationService;
-	
+
+    @PreAuthorize("hasAuthority('Role_Leader')" )
 	@PostMapping("/implementations")
 	public ResponseEntity<Implementation> createImplementation(@RequestBody Implementation implementation){
 		return new ResponseEntity<>(implementationService.createImplementation(implementation),HttpStatus.CREATED);
 	}
-	
+    @PreAuthorize("hasAuthority('Role_Judge')" )
 	@GetMapping("/implementations")
 	 public ResponseEntity<List<Implementation>> fetchAllImplementations() {
         List<Implementation> implementations = implementationService.fetchAllImplementations();
         return new ResponseEntity<>(implementations, HttpStatus.OK);
     }
-	
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
 	@GetMapping("/implementations/{implementationId}")
 	public ResponseEntity<Implementation> getImplementationById(@PathVariable int implementationId) {
         try {
@@ -48,7 +50,7 @@ public class ImplementationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-	
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
 	 @GetMapping("/implementations/team/{teamId}")
 	    public ResponseEntity<?> findImplementationByTeamId(@PathVariable Long teamId) {
 	        try {
@@ -58,7 +60,7 @@ public class ImplementationController {
 	            return ResponseEntity.notFound().build();
 	        }
 	    }
-		
+    @PreAuthorize("hasAuthority('Role_Leader')" )
 	@PutMapping("/implementations/{implementationId}")
 	public ResponseEntity<Implementation> updateImplementationById(@PathVariable int implementationId, @RequestBody Implementation updatedImplementation) {
         try {
@@ -70,7 +72,7 @@ public class ImplementationController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-	
+    @PreAuthorize("hasAuthority('Role_Leader')" )
 	@PutMapping("/implementations/team/{teamId}")
     public ResponseEntity<String> updateImplementationFields(
             @PathVariable Long teamId,
@@ -88,7 +90,7 @@ public class ImplementationController {
         }
     }
 
-	
+    @PreAuthorize("hasAuthority('Role_Judge')" )
 	@PutMapping("/update/{teamId}/score")
     public ResponseEntity<String> updateScoreList(
             @PathVariable Long teamId,
@@ -100,8 +102,8 @@ public class ImplementationController {
         return ResponseEntity.ok("Score list updated successfully.");
     }
 
-	
-	
+
+    @PreAuthorize("hasAuthority('Role_Leader')" )
 	@DeleteMapping("/implementations/{implementationId}")
 	public ResponseEntity<String> deleteImplementationById(@PathVariable int implementationId) {
 		try {

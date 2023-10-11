@@ -28,12 +28,14 @@ public class IdeaController {
         return new ResponseEntity<>(is.submitIdea(idea), HttpStatus.CREATED);
     }
 
+
+    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader')" )
     @GetMapping("/ideas")
     public ResponseEntity<List<Idea>> getIdeas() {
         List<Idea> ideas = is.getIdeas();
         return new ResponseEntity<>(ideas, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
     @GetMapping("/ideas/{id}")
     public ResponseEntity<?> getIdea(@PathVariable Integer id) {
         try {
@@ -44,7 +46,7 @@ public class IdeaController {
         }
     }
 
-
+    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
     @GetMapping("/ideas/team/{teamId}")
     public ResponseEntity<?> findIdeaByTeamId(@PathVariable Long teamId) {
         try {
@@ -55,13 +57,13 @@ public class IdeaController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @PreAuthorize("hasAuthority('Role_Leader')" )
     @PutMapping("/ideas")
     public ResponseEntity<Idea> updateIdea(@RequestBody Idea idea) {
         Idea updatedIdea = is.updateIdea(idea);
         return new ResponseEntity<>(updatedIdea, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasAuthority('Role_Leader')" )
     @PutMapping("/ideas/team/{teamId}")
     public ResponseEntity<String> updateImplementationFields(
             @PathVariable Long teamId,
@@ -76,7 +78,7 @@ public class IdeaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred:"+e.getMessage());
         }
     }
-
+    @PreAuthorize("hasAuthority('Role_Panelist')" )
     @PutMapping("/ideas/updateStatus/{id}")
     public ResponseEntity<String> updateStatus(@PathVariable Integer id, @RequestBody Map<String, String> requestBody) {
         ResponseEntity<String> response;
@@ -90,7 +92,7 @@ public class IdeaController {
         return response;
     }
 
-
+    @PreAuthorize("hasAuthority('Role_Leader')" )
     @DeleteMapping("/ideas/{id}")
     public ResponseEntity<String> deleteIdea(@PathVariable Integer id) {
         try {
