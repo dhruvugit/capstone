@@ -1,18 +1,24 @@
 package capstone.hackathon.capstone.service;
 
+import capstone.hackathon.capstone.entities.Team;
+import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
 
 
 import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.repository.IdeaRepository;
 
+import capstone.hackathon.capstone.repository.TeamRepository;
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.IdeaDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service("is")
 public class IdeaService {
@@ -20,11 +26,16 @@ public class IdeaService {
     @Autowired
     private IdeaRepository ir;
 
-    public Idea submitIdea(IdeaDto ideaDto) {
+    @Autowired
+    private TeamRepository teamRepository;
+
+    public Idea submitIdea(IdeaDto ideaDto, UserInfoUserDetails user) {
+        Team team = teamRepository.findByLeaderId(user.getId()).get();
         Idea idea = new Idea();
         idea.setPdfUrl(ideaDto.getPdfUrl());
         idea.setSummary(ideaDto.getSummary());
         idea.setTitle(ideaDto.getTitle());
+        idea.setTeam(team);
         return ir.save(idea);
     }
 
@@ -42,6 +53,7 @@ public class IdeaService {
             throw new IdeaNotFoundException("Idea with ID " + id + " not found.");
         }
     }
+
 
 
 

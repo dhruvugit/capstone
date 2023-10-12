@@ -1,7 +1,9 @@
 package capstone.hackathon.capstone.controllers;
 
 
+import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.service.IdeaService;
 import capstone.hackathon.capstone.entities.Idea;
 
@@ -11,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -26,16 +31,17 @@ public class IdeaController {
     @PreAuthorize("hasAuthority('Role_User')")
     @PostMapping("/ideas")
     public ResponseEntity<Idea> submitIdea(@RequestBody IdeaDto ideaDto) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = (User) authentication.getPrincipal();
-        return new ResponseEntity<>(is.submitIdea(ideaDto), HttpStatus.CREATED);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+
+        return new ResponseEntity<>(is.submitIdea(ideaDto,user), HttpStatus.CREATED);
     }
 
 
-    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader')" )
+//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader')" )
     @GetMapping("/ideas")
     public ResponseEntity<List<Idea>> getIdeas() {
-        List<Idea> ideas = is.getIdeas();
+        List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
         return new ResponseEntity<>(ideas, HttpStatus.OK);
     }
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
