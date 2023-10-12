@@ -17,13 +17,11 @@ public class Team {
 	private long teamId;
 	private String teamName;
 	private long leaderId;
-	
-	@OneToOne(cascade = CascadeType.ALL)
-	 @JoinColumn(name = "implId", referencedColumnName = "implementation_Id")
+
+	@OneToOne(mappedBy = "team")
 	 private Implementation implementation;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "ideaId", referencedColumnName = "id")
+	@OneToOne(mappedBy = "team")
 	private Idea idea;
 
 	public long getTeamId() {

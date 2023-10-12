@@ -2,15 +2,8 @@ package capstone.hackathon.capstone.entities;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 @Table(name="implementations")
 @Entity
 
@@ -34,9 +27,10 @@ public class Implementation {
 		
 		@ElementCollection
 		private List<Integer> score;
-		
-		@OneToOne(mappedBy = "implementation")
-		private Team team;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "teamId", referencedColumnName = "teamId")
+	private Team team;
 
 		public Team getTeam() {
 			return team;

@@ -32,7 +32,8 @@ public class Idea {
 
     private String pdfUrl;
 
-   @OneToOne(mappedBy="idea")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teamId", referencedColumnName = "teamId")
     private Team team;
 
 

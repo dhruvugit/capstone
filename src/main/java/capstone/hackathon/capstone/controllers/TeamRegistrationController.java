@@ -39,7 +39,11 @@ public class TeamRegistrationController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(registerTeamDto.getLeaderName()+"is alreadly registered as a member in another team.");
     	Team team=teamService.registerTeam(registerTeamDto);
     	String response=teamService.registerTeamMembers(team.getTeamId(), registerTeamDto);
-        if(response!="Successfull!") return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        if(response!="Successfull!") {
+			teamService.deleteById(team.getTeamId());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Team and members registered successfully");
     }
 }

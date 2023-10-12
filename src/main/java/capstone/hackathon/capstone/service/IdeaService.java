@@ -6,6 +6,7 @@ import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
 import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.repository.IdeaRepository;
 
+import capstone.hackathon.capstone.web.dto.IdeaDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,11 @@ public class IdeaService {
     @Autowired
     private IdeaRepository ir;
 
-    public Idea submitIdea(Idea idea) {
+    public Idea submitIdea(IdeaDto ideaDto) {
+        Idea idea = new Idea();
+        idea.setPdfUrl(ideaDto.getPdfUrl());
+        idea.setSummary(ideaDto.getSummary());
+        idea.setTitle(ideaDto.getTitle());
         return ir.save(idea);
     }
 

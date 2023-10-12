@@ -36,7 +36,7 @@ public class TeamServiceImpl implements TeamService{
 		{
 			team.setLeaderId(op.get().getId());
 			team.setTeamName(teamName);
-			User user =us.AddUserRole(op.get(), leaderEmail);
+			User user =us.AddUserRole(op.get(), "Role_Leader");
 			return tr.save(team);
 			
 		}
@@ -45,43 +45,46 @@ public class TeamServiceImpl implements TeamService{
 	@Override
 	public String registerTeamMembers(Long teamId, RegisterTeamDto registerTeamDto) {
 		// TODO Auto-generated method stub
-		if(registerTeamDto.getMember1Email()!=null) {
+		if(registerTeamDto.getMember1Email()!="") {
 			String memberEmail=registerTeamDto.getMember1Email();
 			Optional<User> op= ur.findByUserEmail(memberEmail);
 			if(!op.isEmpty()) {
-				if(tmr.findByMemberId(op.get().getId())!=null) {
+				Optional<TeamMembers> op1 = tmr.findByMemberId(op.get().getId());
+				if(!op1.isEmpty()) {
 					return registerTeamDto.getMember1Name()+" is already registered in another team";
 				}
 				TeamMembers tm=new TeamMembers(teamId, op.get().getId());
-				User user =us.AddUserRole(op.get(), memberEmail);
+				User user =us.AddUserRole(op.get(), "Role_Member");
 				tmr.save(tm);
 			}
 			else return "Team Member 1 Email is not registered.";
 		}
-		if(registerTeamDto.getMember2Email()!=null) {
+		if(registerTeamDto.getMember2Email()!="") {
 			String memberEmail=registerTeamDto.getMember2Email();
 			Optional<User> op= ur.findByUserEmail(memberEmail);
 			if(!op.isEmpty()) {
-				if(tmr.findByMemberId(op.get().getId())!=null) {
+				Optional<TeamMembers> op1 = tmr.findByMemberId(op.get().getId());
+				if(!op1.isEmpty()) {
 					return registerTeamDto.getMember2Name()+" is already registered in another team";
 				}
 
 				TeamMembers tm=new TeamMembers(teamId, op.get().getId());
-				User user =us.AddUserRole(op.get(), memberEmail);
+				User user =us.AddUserRole(op.get(), "Role_Member");
 				tmr.save(tm);
 			}
 			else return "Team Member 2 Email is not registered.";
 		}
-		if(registerTeamDto.getMember3Email()!=null) {
+		if(registerTeamDto.getMember3Email()!="") {
 			String memberEmail=registerTeamDto.getMember3Email();
 			Optional<User> op= ur.findByUserEmail(memberEmail);
 			if(!op.isEmpty()) {
-				if(tmr.findByMemberId(op.get().getId())!=null) {
+				Optional<TeamMembers> op1 = tmr.findByMemberId(op.get().getId());
+				if(!op1.isEmpty()) {
 					return registerTeamDto.getMember3Name()+" is already registered in another team";
 				}
 
 				TeamMembers tm=new TeamMembers(teamId, op.get().getId());
-				User user =us.AddUserRole(op.get(), memberEmail);
+				User user =us.AddUserRole(op.get(), "Role_Member");
 				tmr.save(tm);
 			}
 			else return "Team Member 3 Email is not registered.";
@@ -102,6 +105,14 @@ public class TeamServiceImpl implements TeamService{
 		Optional<TeamMembers> op=tmr.findByMemberId(memberId);
 		if(!op.isEmpty()) return op.get();
 		return null;
+	}
+
+
+	@Override
+	public void deleteById(Long id) {
+		// TODO Auto-generated method stub
+		tr.deleteById(id);
+
 	}
 
 	

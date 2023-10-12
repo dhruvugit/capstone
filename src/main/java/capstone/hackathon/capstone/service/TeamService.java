@@ -12,4 +12,5 @@ public interface TeamService {
 	 String registerTeamMembers(Long teamId, RegisterTeamDto registerTeamDto);
 	 Team findTeamByLeaderId(Long leaderId);
 	 TeamMembers findByMemberId(Long memberId);
+	 void deleteById(Long id);
 }

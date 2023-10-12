@@ -6,6 +6,7 @@ import capstone.hackathon.capstone.service.IdeaService;
 import capstone.hackathon.capstone.entities.Idea;
 
 
+import capstone.hackathon.capstone.web.dto.IdeaDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,10 @@ public class IdeaController {
 
     @PreAuthorize("hasAuthority('Role_User')")
     @PostMapping("/ideas")
-    public ResponseEntity<Idea> submitIdea(@RequestBody Idea idea) {
-        return new ResponseEntity<>(is.submitIdea(idea), HttpStatus.CREATED);
+    public ResponseEntity<Idea> submitIdea(@RequestBody IdeaDto ideaDto) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        User user = (User) authentication.getPrincipal();
+        return new ResponseEntity<>(is.submitIdea(ideaDto), HttpStatus.CREATED);
     }
 
 
