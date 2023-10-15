@@ -13,6 +13,7 @@ import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.IdeaDto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -39,10 +40,17 @@ public class IdeaService {
         return ir.save(idea);
     }
 
+//
+//    public List<Idea> getIdeas() {
+//        return new List<>(ir.findAll());
+//    }
 
-    public List<Idea> getIdeas() {
-        return ir.findAll();
-    }
+
+//    public List<Idea> getIdeasWithNullStatus() {
+//        return ir.findIdeasWithNullStatus();
+//    }
+
+
 
     public Idea getIdeaById(Integer id) {
         Optional<Idea> optionalIdea = ir.findById(id);

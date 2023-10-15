@@ -3,6 +3,7 @@ package capstone.hackathon.capstone.entities;
 
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,10 +33,10 @@ public class Idea {
 
     private String pdfUrl;
 
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "teamId", referencedColumnName = "teamId")
     private Team team;
-
 
     private String status;
 

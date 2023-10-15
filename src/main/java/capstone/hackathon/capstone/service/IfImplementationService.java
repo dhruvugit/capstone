@@ -2,6 +2,8 @@ package capstone.hackathon.capstone.service;
 
 import java.util.List;
 
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.web.dto.ImplementationDto;
 import org.springframework.data.repository.query.Param;
 
 import capstone.hackathon.capstone.entities.Implementation;
@@ -13,6 +15,8 @@ public interface IfImplementationService {
 		public Implementation fetchImplementationById(int implementationId);
 		public Implementation updateImplementationById(int implementationId, Implementation implementation);
 		public String deleteImplementationById(int implementationId);
+
+	public Implementation submitImplementation(ImplementationDto implementationDto, UserInfoUserDetails user);
 		
 		
 		public Implementation findImplementationByTeamId(Long teamId);

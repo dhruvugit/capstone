@@ -3,6 +3,9 @@ package capstone.hackathon.capstone.service;
 import java.util.List;
 import java.util.Optional;
 
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.web.dto.ImplementationDto;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
@@ -29,19 +32,41 @@ public class ImplementationService implements IfImplementationService{
         this.teamRepository = teamRepository;
     }
 
-    public Implementation createImplementationByTeamId(Long teamId) {
-        // Check if the team with the provided teamId exists
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamNotFoundException("Team not found for id: " + teamId));
+//    public Implementation createImplementationByTeamId(Long teamId) {
+//        // Check if the team with the provided teamId exists
+//        Team team = teamRepository.findById(teamId)
+//                .orElseThrow(() -> new TeamNotFoundException("Team not found for id: " + teamId));
+//
+//        Implementation implementation = new Implementation();
+//
+//        // Set the Team for the Implementation
+//        implementation.setTeam(team);
+//
+//        return implementationRepository.save(implementation);
+//    }
 
-        Implementation implementation = new Implementation();
+	public Implementation submitImplementation(ImplementationDto implementationDto, UserInfoUserDetails user) {
+		Team team = teamRepository.findByLeaderId(user.getId()).orElse(null);
+		if (team == null) {
+			// Handle the case when the user is not a leader of any team
+			// Maybe throw an exception or return an error response
+			return null;
+		}
 
-        // Set the Team for the Implementation
-        implementation.setTeam(team);
 
-        return implementationRepository.save(implementation);
-    }
-	
+		Implementation implementation = new Implementation();
+		implementation.setGitHubURL(implementationDto.getGitHubURL());
+		implementation.setRecordingURL(implementationDto.getRecordingURL());
+		implementation.setPptURL(implementationDto.getPptURL());
+		implementation.setDescription(implementationDto.getDescription());
+		implementation.setTeam(team);
+
+		return implementationRepository.save(implementation);
+	}
+
+
+
+
 	@Override
 	public Implementation createImplementation(Implementation implementation) {
 		return implementationRepository.save(implementation);

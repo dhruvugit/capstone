@@ -2,10 +2,14 @@ package capstone.hackathon.capstone.controllers;
 
 import java.util.List;
 
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.web.dto.ImplementationDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +38,18 @@ public class ImplementationController {
 	public ResponseEntity<Implementation> createImplementation(@RequestBody Implementation implementation){
 		return new ResponseEntity<>(implementationService.createImplementation(implementation),HttpStatus.CREATED);
 	}
+
+    @PostMapping("/submitImplementation")
+    public ResponseEntity<Implementation> submitImplementation(@RequestBody ImplementationDto implementationDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+        return new ResponseEntity<>(implementationService.submitImplementation(implementationDto,user), HttpStatus.CREATED);
+
+
+    }
+
+
+
     @PreAuthorize("hasAuthority('Role_Judge')" )
 	@GetMapping("/implementations")
 	 public ResponseEntity<List<Implementation>> fetchAllImplementations() {

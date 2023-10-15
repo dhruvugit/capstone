@@ -28,6 +28,22 @@ public class IdeaController {
     @Autowired
     private IdeaService is;
 
+//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
+//    @GetMapping("/ideas/nullStatus")
+//    public ResponseEntity<List<Idea>> getIdeasWithNullStatus() {
+//        List<Idea> ideas = is.getIdeasWithNullStatus();
+//        return new ResponseEntity<>(ideas, HttpStatus.OK);
+//    }
+
+
+
+//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
+//    @GetMapping("/ideas/pending")
+//    public ResponseEntity<List<Idea>> getPendingIdeas() {
+//        List<Idea> pendingIdeas = is.getPendingIdeas();
+//        return new ResponseEntity<>(pendingIdeas, HttpStatus.OK);
+//    }
+
     @PreAuthorize("hasAuthority('Role_User')")
     @PostMapping("/ideas")
     public ResponseEntity<Idea> submitIdea(@RequestBody IdeaDto ideaDto) {
@@ -37,13 +53,14 @@ public class IdeaController {
         return new ResponseEntity<>(is.submitIdea(ideaDto,user), HttpStatus.CREATED);
     }
 
+//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
+//    @GetMapping("/ideas")
+//    public ResponseEntity<List<Idea>> getIdeas() {
+//        List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
+//        return new ResponseEntity<>(ideas, HttpStatus.OK);
+//    }
 
-//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader')" )
-    @GetMapping("/ideas")
-    public ResponseEntity<List<Idea>> getIdeas() {
-        List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
-        return new ResponseEntity<>(ideas, HttpStatus.OK);
-    }
+
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
     @GetMapping("/ideas/{id}")
     public ResponseEntity<?> getIdea(@PathVariable Integer id) {
