@@ -15,6 +15,12 @@ public class Role {
 	public Role() {
 		
 	}
+
+	public static Role fromString(String roleName) {
+		Role role = new Role();
+		role.setName(roleName);
+		return role;
+	}
 	
 	public Role(String name) {
 		super();

@@ -55,11 +55,11 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public User findByUserEmail(String userEmail) {
 		// TODO Auto-generated method stub
-		
-		  Optional<User> op=userRepository.findByUserEmail(userEmail); 
-		  if(!op.isEmpty()) return op.get(); 
+
+		  Optional<User> op=userRepository.findByUserEmail(userEmail);
+		  if(!op.isEmpty()) return op.get();
 		  else return null;
-		 
+
 		/* return userRepository.findByUserEmail(userEmail); */
 	}
 	
@@ -77,28 +77,6 @@ public class UserServiceImpl implements UserService{
 		 
 		
 	}
-@Override
-	public User AddUserRole(User user, String role) {
-		// TODO Auto-generated method stub
-		/*
-		 * User existingUser = userRepository.findById(user.getId()).orElse(null);
-		 * 
-		 * // Find the role by its ID (or any other unique identifier) Role existingRole
-		 * = roleRepository.findById(role.getId()).orElse(null);
-		 * 
-		 * // Check if both the user and role exist if (existingUser != null &&
-		 * existingRole != null) {
-		 */
-	            // Add the role to the user's roles
-				List<Role> existingRoles=user.getRoles();
-				Role r=new Role(role);
-				existingRoles.add(r);
-				user.setRoles(existingRoles);
-				return userRepository.save(user);
-	        
-	        
-		
-	}
 
 	@Override
 	public User removeUserRole(User user, String role) {
@@ -113,6 +91,49 @@ public class UserServiceImpl implements UserService{
 
 			return userRepository.save(user);
 	    }
-	
+
+	public Optional<User> updateUserRoleByEmail(String email, String roleName) {
+		Optional<User> optionalUser = userRepository.findByUserEmail(email);
+		if (optionalUser.isPresent()) {
+			User user = optionalUser.get();
+			Role roleToAdd = Role.fromString(roleName);
+			user.getRoles().add(roleToAdd);
+			userRepository.save(user);
+			return Optional.of(user);
+		}
+		return Optional.empty();
 	}
+
+
+	@Override
+	public User AddUserRole(User user, String role) {
+		// TODO Auto-generated method stub
+		/*
+		 * User existingUser = userRepository.findById(user.getId()).orElse(null);
+		 *
+		 * // Find the role by its ID (or any other unique identifier) Role existingRole
+		 * = roleRepository.findById(role.getId()).orElse(null);
+		 *
+		 * // Check if both the user and role exist if (existingUser != null &&
+		 * existingRole != null) {
+		 */
+		// Add the role to the user's roles
+		List<Role> existingRoles=user.getRoles();
+		Role r=new Role(role);
+		existingRoles.add(r);
+		user.setRoles(existingRoles);
+		return userRepository.save(user);
+
+
+
+	}
+
+
+
+
+
+
+
+
+}
 	

@@ -1,69 +1,82 @@
 package capstone.hackathon.capstone.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.service.UserService;
 import capstone.hackathon.capstone.web.dto.UserRoleRequestDto;
 
-import org.springframework.web.bind.annotation.RequestBody;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
 	@Autowired
 	private UserService userService;
-	/*
-	 * @Autowired private RoleService roleService;
-	 */
-	@PreAuthorize("hasAuthority('Role_Admin')")
-	@PostMapping("/addRoletoUser")
-    public ResponseEntity<User> addUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
-        String userEmail = userRoleRequest.getUserEmail();
-        String roleName = userRoleRequest.getRole();
 
-		User existingUser = userService
-				.findByUsername(userEmail);/*
-											 * Role existingRole = roleService.findRoleByName(roleName);
-											 * if(existingRole==null) System.out.println("No role found");
-											 */
-		
-        if (existingUser != null) {
-            // Add the role to the user's roles
-            User updatedUser = userService.AddUserRole(existingUser, roleName);
-            return ResponseEntity.ok(updatedUser);
-        } else {
-            return ResponseEntity.notFound().build();
+    @PutMapping("/updateRole")
+    public ResponseEntity<String> updateUserRoleByEmail(@RequestBody UserRoleRequestDto userRoleRequestDto) {
+
+        String email = userRoleRequestDto.getUserEmail();
+        String roleName = userRoleRequestDto.getRole();
+
+        if (email != null && roleName != null) {
+            Optional<User> updatedUser = userService.updateUserRoleByEmail(email, roleName);
+
+            if (updatedUser.isPresent()) {
+                return ResponseEntity.ok("User role updated successfully");
+            }
         }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or invalid request");
     }
 
 
-    @PreAuthorize("hasAuthority('Role_Admin')")
-    @PostMapping("/removeRolefromUser")
-    public ResponseEntity<User> removeUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
-        String userEmail = userRoleRequest.getUserEmail();
-        String roleName = userRoleRequest.getRole();
+	/*
+	 * @Autowired private RoleService roleService;
+	 */
+//	@PreAuthorize("hasAuthority('Role_Admin')")
+//	@PostMapping("/addRoletoUser")
+//    public ResponseEntity<User> addUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
+//        String userEmail = userRoleRequest.getUserEmail();
+//        String roleName = userRoleRequest.getRole();
+//
+//		User existingUser = userService
+//				.findByUsername(userEmail);
+//
+//        if (existingUser != null) {
+//            User updatedUser = userService.AddUserRole(existingUser, roleName);
+//            return ResponseEntity.ok(updatedUser);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 
-        User existingUser = userService.findByUserEmail(userEmail);
+//
+//    @PreAuthorize("hasAuthority('Role_Admin')")
+//    @PostMapping("/removeRolefromUser")
+//    public ResponseEntity<User> removeUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
+//        String userEmail = userRoleRequest.getUserEmail();
+//        String roleName = userRoleRequest.getRole();
+//
+//        User existingUser = userService.findByUserEmail(userEmail);
+//
+//        existingUser.setRoles(roleName);
+//
+//        if (existingUser != null ) {
+//            // Remove the role from the user's roles
+//            User updatedUser = userService.removeUserRole(existingUser, roleName);
+//            return ResponseEntity.ok(updatedUser);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//	}
 
-        if (existingUser != null ) {
-            // Remove the role from the user's roles
-            User updatedUser = userService.removeUserRole(existingUser, roleName);
-            return ResponseEntity.ok(updatedUser);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-	}/*
-		 * @PostMapping("/CreateRole") public ResponseEntity<String>
-		 * createRole(@RequestBody String roleName){ Role
-		 * roleCreated=roleService.AddRole(roleName); if(roleCreated!=null) return
-		 * ResponseEntity.status(HttpStatus.CREATED).body("Role registered successfully"
-		 * ); else return ResponseEntity.status(HttpStatus.BAD_REQUEST).
-		 * body("User registration failed."); }
-		 */
+
+
+
 }
