@@ -29,7 +29,7 @@ import capstone.hackathon.capstone.service.IfImplementationService;
 
 
 @RestController
-@RequestMapping(path="/user")
+@RequestMapping(path="/api")
 public class ImplementationController {
 		
 	@Autowired IfImplementationService implementationService;

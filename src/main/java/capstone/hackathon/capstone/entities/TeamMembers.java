@@ -19,6 +19,10 @@ public class TeamMembers {
 		this.teamId = teamId;
 		this.memberId = memberId;
 	}
+
+	public TeamMembers(){
+
+	}
 	@Override
 	public String toString() {
 		return "TeamMembers [id=" + id + ", teamId=" + teamId + ", memberId=" + memberId + "]";

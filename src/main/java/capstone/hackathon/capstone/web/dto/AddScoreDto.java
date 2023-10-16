@@ -5,14 +5,14 @@ import java.util.List;
 
 public class AddScoreDto {
 
-    private int implementationId;
+    private String implementationId;
     private List<Integer> scores;
 
-    public int getImplementationId() {
+    public String getImplementationId() {
         return implementationId;
     }
 
-    public void setImplementationId(int implementationId) {
+    public void setImplementationId(String implementationId) {
         this.implementationId = implementationId;
     }
 

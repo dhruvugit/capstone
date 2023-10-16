@@ -39,4 +39,10 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
     void updateIdeaFields(@Param("teamId") Long teamId, @Param("newtitle") String newField1, @Param("newsummary") String newField2, @Param("newpdfUrl") String newField3);
 
     List<Idea> findByStatusIsNull();
+
+    //List<Idea> findByTeamId();
+
+    @Query("SELECT i FROM Idea i JOIN i.team t WHERE t.teamId = :teamId")
+    List<Idea> findByTeamId(Long teamId);
+
 }

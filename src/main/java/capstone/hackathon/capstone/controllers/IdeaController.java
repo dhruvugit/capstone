@@ -19,8 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -35,15 +33,6 @@ public class IdeaController {
         List<Idea> ideas = is.getIdeasWithNullStatus();
         return new ResponseEntity<>(ideas, HttpStatus.OK);
     }
-
-
-
-//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
-//    @GetMapping("/ideas/pending")
-//    public ResponseEntity<List<Idea>> getPendingIdeas() {
-//        List<Idea> pendingIdeas = is.getPendingIdeas();
-//        return new ResponseEntity<>(pendingIdeas, HttpStatus.OK);
-//    }
 
     @PreAuthorize("hasAuthority('Role_User')")
     @PostMapping("/ideas")

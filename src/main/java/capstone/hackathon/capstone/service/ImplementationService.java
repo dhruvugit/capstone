@@ -142,10 +142,10 @@ public class ImplementationService implements IfImplementationService{
 //    }
 
 	public void addScores(AddScoreDto addScoreDto) {
-		int implementationId = addScoreDto.getImplementationId();
+		String implementationId = addScoreDto.getImplementationId();
 		List<Integer> scores = addScoreDto.getScores();
 
-		Implementation implementation = implementationRepository.findById(implementationId).orElse(null);
+		Implementation implementation = implementationRepository.findById(Integer.parseInt(implementationId)).orElse(null);
 
 		if (implementation != null) {
 			implementation.getScore().addAll(scores);

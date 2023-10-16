@@ -1,7 +1,9 @@
 package capstone.hackathon.capstone.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import capstone.hackathon.capstone.entities.Idea;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +16,11 @@ import jakarta.transaction.Transactional;
 @Repository("implementationRepository")
 public interface ImplementationRepository extends JpaRepository<Implementation, Integer>{
     Optional<Implementation> findByTeam_TeamId(Long teamId);
+
+    @Query("SELECT i FROM Implementation i JOIN i.team t WHERE t.teamId = :teamId")
+    List<Implementation> findByTeamId(Long teamId);
+
+
     
     @Modifying
     @Transactional
