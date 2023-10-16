@@ -1,6 +1,7 @@
 package capstone.hackathon.capstone.controllers;
 
 
+import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
@@ -18,7 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/api")
@@ -51,16 +54,34 @@ public class IdeaController {
     }
 
 
-    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
+//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
+//    @GetMapping("/ideas/{id}")
+//    public ResponseEntity<?> getIdea(@PathVariable Integer id) {
+//        try {
+//            Idea idea = is.getIdeaById(id);
+//            return new ResponseEntity<>(idea, HttpStatus.OK);
+//        } catch (IdeaNotFoundException e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+//        }
+//    }
+
+    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')")
     @GetMapping("/ideas/{id}")
     public ResponseEntity<?> getIdea(@PathVariable Integer id) {
         try {
             Idea idea = is.getIdeaById(id);
-            return new ResponseEntity<>(idea, HttpStatus.OK);
+            Team team = idea.getTeam();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("idea", idea);
+            response.put("team", team);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IdeaNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
 
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
     @GetMapping("/ideas/team/{teamId}")
