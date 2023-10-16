@@ -9,6 +9,7 @@ public interface UserService {
 	User findByUserEmail(String userEmail);
 	User AddUserRole(User user,String role);
 	User removeUserRole(User user,String role);
-	String removeUserByUsername(String username);
+	//String removeUserByUsername(String username);
+	String removeUserByUserEmail(String userEmail);
 
 }

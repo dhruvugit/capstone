@@ -8,6 +8,7 @@ import capstone.hackathon.capstone.service.IdeaService;
 import capstone.hackathon.capstone.entities.Idea;
 
 
+import capstone.hackathon.capstone.web.dto.ChangeStatusDto;
 import capstone.hackathon.capstone.web.dto.IdeaDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,12 +29,12 @@ public class IdeaController {
     @Autowired
     private IdeaService is;
 
-//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
-//    @GetMapping("/ideas/nullStatus")
-//    public ResponseEntity<List<Idea>> getIdeasWithNullStatus() {
-//        List<Idea> ideas = is.getIdeasWithNullStatus();
-//        return new ResponseEntity<>(ideas, HttpStatus.OK);
-//    }
+    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
+    @GetMapping("/ideas/nullStatus")
+    public ResponseEntity<List<Idea>> getIdeasWithNullStatus() {
+        List<Idea> ideas = is.getIdeasWithNullStatus();
+        return new ResponseEntity<>(ideas, HttpStatus.OK);
+    }
 
 
 
@@ -54,11 +55,11 @@ public class IdeaController {
     }
 
 //    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
-//    @GetMapping("/ideas")
-//    public ResponseEntity<List<Idea>> getIdeas() {
-//        List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
-//        return new ResponseEntity<>(ideas, HttpStatus.OK);
-//    }
+    @GetMapping("/ideas")
+    public ResponseEntity<List<Idea>> getIdeas() {
+        List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
+        return new ResponseEntity<>(ideas, HttpStatus.OK);
+    }
 
 
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
@@ -89,7 +90,7 @@ public class IdeaController {
         Idea updatedIdea = is.updateIdea(idea);
         return new ResponseEntity<>(updatedIdea, HttpStatus.OK);
     }
-    @PreAuthorize("hasAuthority('Role_Leader')" )
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
     @PutMapping("/ideas/team/{teamId}")
     public ResponseEntity<String> updateImplementationFields(
             @PathVariable Long teamId,
@@ -104,12 +105,15 @@ public class IdeaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred:"+e.getMessage());
         }
     }
-    @PreAuthorize("hasAuthority('Role_Panelist')" )
+    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')")
     @PutMapping("/ideas/updateStatus/{id}")
-    public ResponseEntity<String> updateStatus(@PathVariable Integer id, @RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<String> updateStatus(
+            @PathVariable Integer id,
+            @RequestBody ChangeStatusDto changeStatusDto) {
+
         ResponseEntity<String> response;
         try {
-            String status = requestBody.get("status");
+            String status = changeStatusDto.getStatus();
             is.updateStatus(id, status);
             response = new ResponseEntity<>("Status updated successfully.", HttpStatus.OK);
         } catch (IdeaNotFoundException e) {
@@ -117,6 +121,8 @@ public class IdeaController {
         }
         return response;
     }
+
+
 
     @PreAuthorize("hasAuthority('Role_Leader')" )
     @DeleteMapping("/ideas/{id}")

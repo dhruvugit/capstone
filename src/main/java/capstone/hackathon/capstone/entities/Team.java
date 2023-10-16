@@ -1,5 +1,6 @@
 package capstone.hackathon.capstone.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,9 +19,11 @@ public class Team {
 	private String teamName;
 	private long leaderId;
 
+	@JsonIgnore
 	@OneToOne(mappedBy = "team")
 	 private Implementation implementation;
 
+	@JsonIgnore
 	@OneToOne(mappedBy = "team")
 	private Idea idea;
 

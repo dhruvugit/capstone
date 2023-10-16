@@ -1,14 +1,17 @@
 package capstone.hackathon.capstone.web.dto;
 
 public class UserRoleRequestDto {
-	private String username;
+	private String userEmail;
     private String role;
-	public String getUsername() {
-		return username;
+
+	public String getUserEmail() {
+		return userEmail;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
+
 	public String getRole() {
 		return role;
 	}

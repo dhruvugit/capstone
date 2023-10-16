@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service("is")
 public class IdeaService {
@@ -40,15 +37,16 @@ public class IdeaService {
         return ir.save(idea);
     }
 
-//
-//    public List<Idea> getIdeas() {
-//        return new List<>(ir.findAll());
-//    }
+
+    public List<Idea> getIdeas() {
+        return new ArrayList<>(ir.findAll());
+    }
 
 
-//    public List<Idea> getIdeasWithNullStatus() {
-//        return ir.findIdeasWithNullStatus();
-//    }
+
+    public List<Idea> getIdeasWithNullStatus() {
+        return ir.findIdeasWithNullStatus();
+    }
 
 
 
@@ -71,16 +69,11 @@ public class IdeaService {
 
 
     public void updateStatus(Integer id, String status) throws IdeaNotFoundException {
-        Optional<Idea> optionalIdea = ir.findById(id);
-
-        if (optionalIdea.isPresent()) {
-            Idea idea = optionalIdea.get();
-            idea.setStatus(status);
-            ir.save(idea);
-        } else {
-            throw new IdeaNotFoundException("Idea with ID " + id + " not found.");
-        }
+        Idea idea = ir.findById(id).orElseThrow(() -> new IdeaNotFoundException("Idea with ID " + id + " not found"));
+        idea.setStatus(status);
+        ir.save(idea);
     }
+
 
 
     public void deleteIdea(Integer id) throws IdeaNotFoundException {

@@ -65,12 +65,12 @@ public class UserServiceImpl implements UserService{
 	
 
 	@Override
-	public String removeUserByUsername(String username) {
+	public String removeUserByUserEmail(String userEmail) {
 		// TODO Auto-generated method stub
 		
-		  Optional<User> op=userRepository.findByUsername(username); if(!op.isEmpty())
+		  Optional<User> op=userRepository.findByUserEmail(userEmail); if(!op.isEmpty())
 		  { userRepository.delete(op.get()); 
-		  return "User with username "+username+" is deleted successfully!"; 
+		  return "User with username "+userEmail+" is deleted successfully!";
 		  } 
 		  else return
 		  "No user found";
@@ -107,12 +107,9 @@ public class UserServiceImpl implements UserService{
 
 	        // Check if both the user and role exist
 		 	List<Role> existingRoles=user.getRoles();
-		 	Optional<Role> r=roleRepository.findByName(role);
-		 	if(r!=null)
-		 	{
-		 		existingRoles.remove(r.get());
+		 		existingRoles.remove(role);
 				user.setRoles(existingRoles);
-		 	}
+
 
 			return userRepository.save(user);
 	    }

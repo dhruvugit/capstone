@@ -2,6 +2,7 @@ package capstone.hackathon.capstone.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Table(name="implementations")
@@ -28,6 +29,7 @@ public class Implementation {
 		@ElementCollection
 		private List<Integer> score;
 
+	@JsonIgnore
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "teamId", referencedColumnName = "teamId")
 	private Team team;

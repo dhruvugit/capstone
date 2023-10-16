@@ -3,6 +3,7 @@ package capstone.hackathon.capstone.controllers;
 import java.util.List;
 
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,12 +46,11 @@ public class ImplementationController {
         UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
         return new ResponseEntity<>(implementationService.submitImplementation(implementationDto,user), HttpStatus.CREATED);
 
-
     }
 
 
 
-    @PreAuthorize("hasAuthority('Role_Judge')" )
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
 	@GetMapping("/implementations")
 	 public ResponseEntity<List<Implementation>> fetchAllImplementations() {
         List<Implementation> implementations = implementationService.fetchAllImplementations();
@@ -106,16 +106,24 @@ public class ImplementationController {
         }
     }
 
-    @PreAuthorize("hasAuthority('Role_Judge')" )
-	@PutMapping("/update/{teamId}/score")
-    public ResponseEntity<String> updateScoreList(
-            @PathVariable Long teamId,
-            @RequestParam(name = "scoreList") List<Integer> scoreList) {
+//    @PreAuthorize("hasAuthority('Role_Judge') or hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
+//	@PutMapping("/update/{teamId}/score")
+//    public ResponseEntity<String> updateScoreList(
+//            @PathVariable Long teamId,
+//            @RequestParam(name = "scoreList") List<Integer> scoreList) {
+//
+//        // Call the service method to update the score list
+//        implementationService.updateScoreList(teamId, scoreList);
+//
+//        return ResponseEntity.ok("Score list updated successfully.");
+//    }
 
-        // Call the service method to update the score list
-        implementationService.updateScoreList(teamId, scoreList);
 
-        return ResponseEntity.ok("Score list updated successfully.");
+    @PreAuthorize("hasAuthority('Role_Judge') or hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
+    @PostMapping("/implementations/addScores")
+    public ResponseEntity<String> addScores(@RequestBody AddScoreDto addScoreDto) {
+        implementationService.addScores(addScoreDto);
+        return new ResponseEntity<>("Scores added successfully.", HttpStatus.OK);
     }
 
 

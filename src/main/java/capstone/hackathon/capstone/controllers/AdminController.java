@@ -24,11 +24,11 @@ public class AdminController {
 	@PreAuthorize("hasAuthority('Role_Admin')")
 	@PostMapping("/addRoletoUser")
     public ResponseEntity<User> addUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
-        String username = userRoleRequest.getUsername();
+        String userEmail = userRoleRequest.getUserEmail();
         String roleName = userRoleRequest.getRole();
 
 		User existingUser = userService
-				.findByUsername(username);/*
+				.findByUsername(userEmail);/*
 											 * Role existingRole = roleService.findRoleByName(roleName);
 											 * if(existingRole==null) System.out.println("No role found");
 											 */
@@ -46,10 +46,10 @@ public class AdminController {
     @PreAuthorize("hasAuthority('Role_Admin')")
     @PostMapping("/removeRolefromUser")
     public ResponseEntity<User> removeUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
-        String username = userRoleRequest.getUsername();
+        String userEmail = userRoleRequest.getUserEmail();
         String roleName = userRoleRequest.getRole();
 
-        User existingUser = userService.findByUsername(username);
+        User existingUser = userService.findByUserEmail(userEmail);
 
         if (existingUser != null ) {
             // Remove the role from the user's roles

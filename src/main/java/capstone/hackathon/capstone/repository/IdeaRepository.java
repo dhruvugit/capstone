@@ -25,8 +25,8 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
 //    @Query("SELECT i FROM Idea i WHERE i.status IS NULL")
 //    List<Idea> findIdeasWithNullStatus();
 
-//    @Query(value = "SELECT * FROM idea_table WHERE status IS NULL", nativeQuery = true)
-//    List<Idea> findIdeasWithNullStatus();
+    @Query(value = "SELECT * FROM ideas WHERE status IS NULL", nativeQuery = true)
+    List<Idea> findIdeasWithNullStatus();
 
     // List<Idea> findByStatusIsNull();
 

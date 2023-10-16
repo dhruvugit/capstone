@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,19 +127,31 @@ public class ImplementationService implements IfImplementationService{
         implementationRepository.updateImplementationFields(teamId, newField1, newField2, newField3,newField4);
     }
 	
-    public void updateScoreList(Long teamId, List<Integer> scoreList) {
-        // You can implement the logic here to update the score list for the given teamId.
-        // You might need to fetch the Implementation entity by teamId and update its score list.
-        
-    	 Optional<Implementation> optionalImplementation = implementationRepository.findByTeam_TeamId(teamId);
-         if (optionalImplementation.isPresent()) {
-             Implementation implementation = optionalImplementation.get();
-             implementation.setScore(scoreList);
-             implementationRepository.save(implementation);
-         } else {
-             throw new TeamNotFoundException("No Implementation found for Team ID: " + teamId);
-         }
-    }
+//    public void updateScoreList(Long teamId, List<Integer> scoreList) {
+//        // You can implement the logic here to update the score list for the given teamId.
+//        // You might need to fetch the Implementation entity by teamId and update its score list.
+//
+//    	 Optional<Implementation> optionalImplementation = implementationRepository.findByTeam_TeamId(teamId);
+//         if (optionalImplementation.isPresent()) {
+//             Implementation implementation = optionalImplementation.get();
+//             implementation.setScore(scoreList);
+//             implementationRepository.save(implementation);
+//         } else {
+//             throw new TeamNotFoundException("No Implementation found for Team ID: " + teamId);
+//         }
+//    }
+
+	public void addScores(AddScoreDto addScoreDto) {
+		int implementationId = addScoreDto.getImplementationId();
+		List<Integer> scores = addScoreDto.getScores();
+
+		Implementation implementation = implementationRepository.findById(implementationId).orElse(null);
+
+		if (implementation != null) {
+			implementation.getScore().addAll(scores);
+			implementationRepository.save(implementation);
+		}
+	}
 
 	
 }

@@ -1,6 +1,7 @@
 package capstone.hackathon.capstone.entities;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,7 +24,8 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private String userEmail;
-	
+
+	  @JsonIgnore
 	  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	  
 	  @JoinTable( name = "users_roles", joinColumns = @JoinColumn( name =
