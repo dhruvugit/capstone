@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.Team;
+import capstone.hackathon.capstone.repository.IdeaRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
@@ -35,6 +37,9 @@ import capstone.hackathon.capstone.service.IfImplementationService;
 @RestController
 @RequestMapping(path="/api")
 public class ImplementationController {
+
+    @Autowired
+    private IdeaRepository ideaRepository;
 		
 	@Autowired IfImplementationService implementationService;
 
@@ -54,7 +59,7 @@ public class ImplementationController {
 
 
 
-    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')")
     @GetMapping("/implementations")
     public ResponseEntity<List<Map<String, Object>>> fetchAllImplementationsWithTeamNames() {
         List<Implementation> implementations = implementationService.fetchAllImplementations();
@@ -64,15 +69,22 @@ public class ImplementationController {
             Team team = implementation.getTeam();
             String teamName = team != null ? team.getTeamName() : null;
 
+            List<Idea> ideaList = ideaRepository.findByTeamId(implementation.getTeam().getTeamId());
+            Idea idea = !ideaList.isEmpty() ? ideaList.get(0) : null;
+
             Map<String, Object> response = new HashMap<>();
             response.put("implementation", implementation);
             response.put("teamName", teamName);
+            response.put("ideaTitle", idea != null ? idea.getTitle() : null);
 
             implementationResponses.add(response);
         }
 
         return new ResponseEntity<>(implementationResponses, HttpStatus.OK);
     }
+
+
+
 
     @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
 	@GetMapping("/implementations/{implementationId}")

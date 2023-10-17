@@ -40,6 +40,8 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
 
     List<Idea> findByStatusIsNull();
 
+
+
     //List<Idea> findByTeamId();
 
     @Query("SELECT i FROM Idea i JOIN i.team t WHERE t.teamId = :teamId")
