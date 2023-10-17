@@ -86,16 +86,29 @@ public class ImplementationController {
 
 
 
-    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
-	@GetMapping("/implementations/{implementationId}")
-	public ResponseEntity<Implementation> getImplementationById(@PathVariable int implementationId) {
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')")
+    @GetMapping("/implementations/{implementationId}")
+    public ResponseEntity<Map<String, Object>> getImplementationById(@PathVariable int implementationId) {
         try {
             Implementation implementation = implementationService.fetchImplementationById(implementationId);
-            return new ResponseEntity<>(implementation, HttpStatus.OK);
+
+            Team team = implementation.getTeam();
+            String teamName = team != null ? team.getTeamName() : null;
+
+            List<Idea> ideaList = ideaRepository.findByTeamId(team.getTeamId());
+            Idea idea = !ideaList.isEmpty() ? ideaList.get(0) : null;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("implementation", implementation);
+            response.put("teamName", teamName);
+            response.put("idea", idea);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (ImplementationNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
 	 @GetMapping("/implementations/team/{teamId}")
 	    public ResponseEntity<?> findImplementationByTeamId(@PathVariable Long teamId) {
