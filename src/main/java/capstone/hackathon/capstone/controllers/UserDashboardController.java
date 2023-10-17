@@ -60,7 +60,16 @@ public class UserDashboardController {
         if (optionalTeam.isPresent()) {
             Team team = optionalTeam.get();
             List<Idea> ideas = ideaRepository.findByTeamId(team.getTeamId());
-            return ResponseEntity.ok(ideas);
+
+            // Fetch the team name
+            String teamName = team.getTeamName();
+
+            // Create a response map
+            Map<String, Object> response = new HashMap<>();
+            response.put("teamName", teamName);
+            response.put("ideas", ideas);
+
+            return ResponseEntity.ok(response);
         } else {
             // Step 2: If the user is not a leader, try to find the team where they are a member
             Optional<TeamMembers> optionalMemberTeam = teamMembersRepository.findByMemberId(userId);
@@ -69,7 +78,17 @@ public class UserDashboardController {
                 TeamMembers teamMembers = optionalMemberTeam.get();
                 Long teamId = teamMembers.getTeamId();
                 List<Idea> ideas = ideaRepository.findByTeamId(teamId);
-                return ResponseEntity.ok(ideas);
+
+                // Fetch the team name
+                Optional<Team> optionalTeamForMember = teamRepository.findByTeamId(teamId);
+                String teamName = optionalTeamForMember.map(Team::getTeamName).orElse("Team Name Not Available");
+
+                // Create a response map
+                Map<String, Object> response = new HashMap<>();
+                response.put("teamName", teamName);
+                response.put("ideas", ideas);
+
+                return ResponseEntity.ok(response);
             } else {
                 // Step 3: If no team is found in either case, return "No Team Found"
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Team Found");
