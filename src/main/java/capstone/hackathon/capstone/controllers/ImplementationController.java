@@ -8,6 +8,7 @@ import java.util.Map;
 import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.repository.IdeaRepository;
+import capstone.hackathon.capstone.repository.ImplementationRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
@@ -40,6 +41,10 @@ public class ImplementationController {
 
     @Autowired
     private IdeaRepository ideaRepository;
+
+    @Autowired
+    private ImplementationRepository implementationRepository;
+
 		
 	@Autowired IfImplementationService implementationService;
 
@@ -120,17 +125,30 @@ public class ImplementationController {
 	        }
 	    }
     @PreAuthorize("hasAuthority('Role_Leader')" )
-	@PutMapping("/implementations/{implementationId}")
-	public ResponseEntity<Implementation> updateImplementationById(@PathVariable int implementationId, @RequestBody Implementation updatedImplementation) {
+    @PutMapping("/implementations/{implementationId}")
+    public ResponseEntity<Implementation> updateImplementationById(@PathVariable int implementationId, @RequestBody ImplementationDto updatedImplementationDto) {
         try {
-            Implementation implementation = implementationService.updateImplementationById(implementationId,updatedImplementation);
-            return new ResponseEntity<>(implementation, HttpStatus.OK);
+            Implementation existingImplementation = implementationService.fetchImplementationById(implementationId);
+
+            // Set the properties from the DTO
+            existingImplementation.setGitHubURL(updatedImplementationDto.getGitHubURL());
+            existingImplementation.setRecordingURL(updatedImplementationDto.getRecordingURL());
+            existingImplementation.setPptURL(updatedImplementationDto.getPptURL());
+            existingImplementation.setDescription(updatedImplementationDto.getDescription());
+
+            // Save the updated implementation back to the database
+            implementationRepository.save(existingImplementation);
+
+            return new ResponseEntity<>(existingImplementation, HttpStatus.OK);
         } catch (ImplementationNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+
+
     @PreAuthorize("hasAuthority('Role_Leader')" )
 	@PutMapping("/implementations/team/{teamId}")
     public ResponseEntity<String> updateImplementationFields(
