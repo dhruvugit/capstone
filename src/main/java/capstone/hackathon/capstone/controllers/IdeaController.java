@@ -4,6 +4,7 @@ package capstone.hackathon.capstone.controllers;
 import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
+import capstone.hackathon.capstone.repository.TeamRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.service.IdeaService;
 import capstone.hackathon.capstone.entities.Idea;
@@ -19,13 +20,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/v1/api")
 public class IdeaController {
+
+    @Autowired
+    private TeamRepository teamRepository;
 
     @Autowired
     private IdeaService is;
@@ -47,11 +49,26 @@ public class IdeaController {
     }
 
 //    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
-    @GetMapping("/ideas")
-    public ResponseEntity<List<Idea>> getIdeas() {
-        List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
-        return new ResponseEntity<>(ideas, HttpStatus.OK);
+@GetMapping("/ideas")
+public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
+    List<Idea> ideas = is.getIdeas(); // Assuming this method returns a List<Idea>
+
+    List<Map<String, Object>> ideaResponses = new ArrayList<>();
+    for (Idea idea : ideas) {
+        Team team = idea.getTeam();
+        String teamName = team != null ? team.getTeamName() : null;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("idea", idea);
+        response.put("teamName", teamName);
+
+        ideaResponses.add(response);
     }
+
+    return new ResponseEntity<>(ideaResponses, HttpStatus.OK);
+}
+
+
 
 
 //    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )

@@ -1,7 +1,11 @@
 package capstone.hackathon.capstone.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
@@ -51,11 +55,25 @@ public class ImplementationController {
 
 
     @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
-	@GetMapping("/implementations")
-	 public ResponseEntity<List<Implementation>> fetchAllImplementations() {
+    @GetMapping("/implementations")
+    public ResponseEntity<List<Map<String, Object>>> fetchAllImplementationsWithTeamNames() {
         List<Implementation> implementations = implementationService.fetchAllImplementations();
-        return new ResponseEntity<>(implementations, HttpStatus.OK);
+
+        List<Map<String, Object>> implementationResponses = new ArrayList<>();
+        for (Implementation implementation : implementations) {
+            Team team = implementation.getTeam();
+            String teamName = team != null ? team.getTeamName() : null;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("implementation", implementation);
+            response.put("teamName", teamName);
+
+            implementationResponses.add(response);
+        }
+
+        return new ResponseEntity<>(implementationResponses, HttpStatus.OK);
     }
+
     @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
 	@GetMapping("/implementations/{implementationId}")
 	public ResponseEntity<Implementation> getImplementationById(@PathVariable int implementationId) {
