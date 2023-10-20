@@ -11,13 +11,15 @@ import capstone.hackathon.capstone.service.UserService;
 import capstone.hackathon.capstone.web.dto.UserRoleRequestDto;
 
 import java.util.Optional;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
 	@Autowired
 	private UserService userService;
 
+
+    @PreAuthorize("hasAuthority('Role_Admin')" )
     @PutMapping("/updateRole")
     public ResponseEntity<String> updateUserRoleByEmail(@RequestBody UserRoleRequestDto userRoleRequestDto) {
 

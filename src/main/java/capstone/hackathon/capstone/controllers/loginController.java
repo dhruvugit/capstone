@@ -7,9 +7,7 @@ import capstone.hackathon.capstone.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
 import capstone.hackathon.capstone.entities.User;
@@ -17,7 +15,7 @@ import capstone.hackathon.capstone.service.UserService;
 import capstone.hackathon.capstone.web.dto.LoginRequestDto;
 import capstone.hackathon.capstone.web.dto.ResetPasswordDto;
 
-import org.springframework.web.bind.annotation.RequestBody;
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/auth")
 public class loginController {

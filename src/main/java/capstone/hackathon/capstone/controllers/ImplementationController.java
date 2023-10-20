@@ -1,14 +1,12 @@
 package capstone.hackathon.capstone.controllers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.repository.IdeaRepository;
 import capstone.hackathon.capstone.repository.ImplementationRepository;
+import capstone.hackathon.capstone.repository.TeamRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
@@ -18,22 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import capstone.hackathon.capstone.exceptions.*;
 
 import capstone.hackathon.capstone.entities.Implementation;
 import capstone.hackathon.capstone.service.IfImplementationService;
 
-
+@CrossOrigin("*")
 
 @RestController
 @RequestMapping(path="/api")
@@ -41,6 +31,9 @@ public class ImplementationController {
 
     @Autowired
     private IdeaRepository ideaRepository;
+
+    @Autowired
+    private TeamRepository teamRepository;
 
     @Autowired
     private ImplementationRepository implementationRepository;
@@ -55,12 +48,32 @@ public class ImplementationController {
 	}
 
     @PostMapping("/submitImplementation")
-    public ResponseEntity<Implementation> submitImplementation(@RequestBody ImplementationDto implementationDto) {
+    public ResponseEntity<?> submitImplementation(@RequestBody ImplementationDto implementationDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-        return new ResponseEntity<>(implementationService.submitImplementation(implementationDto,user), HttpStatus.CREATED);
 
+        // Get the associated team
+        Optional<Team> team = teamRepository.findByLeaderId(user.getId());
+
+        if (team.isPresent()) {
+            // Get the associated idea
+            Long teamId = team.get().getTeamId();
+            List<Idea> ideaList = ideaRepository.findByTeamId(teamId);
+
+            Idea idea = !ideaList.isEmpty() ? ideaList.get(0) : null;
+
+            if (idea != null && idea.getStatus().equals("approved")) {
+                Implementation implementation = implementationService.submitImplementation(implementationDto, user);
+                return new ResponseEntity<>(implementation, HttpStatus.CREATED);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Idea must be approved before submitting an implementation.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must be a leader of a team to submit an implementation.");
+        }
     }
+
+
 
 
 

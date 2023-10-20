@@ -54,10 +54,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-
-
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -70,8 +66,6 @@ public class SecurityConfig {
 
 
                 );
-
-
         http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);

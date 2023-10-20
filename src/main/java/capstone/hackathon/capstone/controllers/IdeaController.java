@@ -4,6 +4,7 @@ package capstone.hackathon.capstone.controllers;
 import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
+import capstone.hackathon.capstone.repository.IdeaRepository;
 import capstone.hackathon.capstone.repository.TeamRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.service.IdeaService;
@@ -22,9 +23,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/v1/api")
 public class IdeaController {
+    @Autowired
+    private IdeaRepository ideaRepository;
 
     @Autowired
     private TeamRepository teamRepository;
@@ -117,21 +121,30 @@ public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
         Idea updatedIdea = is.updateIdea(idea);
         return new ResponseEntity<>(updatedIdea, HttpStatus.OK);
     }
-    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
-    @PutMapping("/ideas/team/{teamId}")
-    public ResponseEntity<String> updateImplementationFields(
-            @PathVariable Long teamId,
-            @RequestParam(name = "newtitle") String newtitle,
-            @RequestParam(name = "newsummary") String newsummary,
-            @RequestParam(name = "newpdfUrl") String newpdfUrl) {
+    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')")
+    @PutMapping("/ideas/{ideaId}")
+    public ResponseEntity<String> updateIdeaFields(
+            @PathVariable Integer ideaId,
+            @RequestBody IdeaDto updatedIdeaDto) {
         try {
-            is.updateIdeaFields(teamId, newtitle, newsummary, newpdfUrl);
+            Idea existingIdea = is.getIdeaById(ideaId);
+
+            // Set the properties from the DTO
+            existingIdea.setTitle(updatedIdeaDto.getTitle());
+            existingIdea.setSummary(updatedIdeaDto.getSummary());
+            existingIdea.setPdfUrl(updatedIdeaDto.getPdfUrl());
+
+            // Save the updated idea back to the database
+            ideaRepository.save(existingIdea);
+
             return ResponseEntity.ok("Fields updated successfully.");
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred:"+e.getMessage());
+        } catch (IdeaNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Idea not found.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
     }
+
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')")
     @PutMapping("/ideas/updateStatus/{id}")
     public ResponseEntity<String> updateStatus(
