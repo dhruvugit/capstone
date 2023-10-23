@@ -211,6 +211,21 @@ public class ImplementationController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }   
 		 }
+
+
+
+//    @GetMapping("/team-scores")
+//    public ResponseEntity<?> getTeamScores() {
+//        try {
+//            return ResponseEntity.ok(implementationService.getTeamScores());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+//        }
+//    }
+
+
+
+
       
 	
 }

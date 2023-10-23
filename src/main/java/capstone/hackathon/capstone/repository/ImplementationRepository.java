@@ -27,4 +27,12 @@ public interface ImplementationRepository extends JpaRepository<Implementation, 
     @Query("UPDATE Implementation i SET i.gitHubURL = :newgitHubURL, i.recordingURL = :newrecordingURL, i.pptURL = :newpptURL,i.description = :newdescription WHERE i.team.teamId = :teamId")
     void updateImplementationFields(@Param("teamId") Long teamId, @Param("newgitHubURL") String newField1, @Param("newrecordingURL") String newField2,@Param("newpptURL") String newField3,@Param("newdescription") String newField4);
 
+
+//    @Query("SELECT i, SUM(s.score) " +
+//            "FROM Implementation i " +
+//            "JOIN i.score s " +
+//            "GROUP BY i " +
+//            "ORDER BY i.implementationId")
+//    List<Object[]> getTeamScores();
+
 }

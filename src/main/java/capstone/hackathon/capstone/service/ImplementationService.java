@@ -1,7 +1,9 @@
 package capstone.hackathon.capstone.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
@@ -152,6 +154,23 @@ public class ImplementationService implements IfImplementationService{
 			implementationRepository.save(implementation);
 		}
 	}
+
+
+//	public List<Map<String, Object>> getTeamScores() {
+//		List<Object[]> teamScoreObjects = implementationRepository.getTeamScores();
+//
+//		return teamScoreObjects.stream().map(objects -> {
+//			Implementation implementation = (Implementation) objects[0];
+//			int totalScore = ((Number) objects[1]).intValue();
+//
+//			Map<String, Object> response = Map.of(
+//					"implementation", implementation,
+//					"totalScore", totalScore
+//			);
+//
+//			return response;
+//		}).collect(Collectors.toList());
+//	}
 
 	
 }

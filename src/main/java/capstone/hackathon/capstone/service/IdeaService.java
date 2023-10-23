@@ -12,6 +12,7 @@ import capstone.hackathon.capstone.repository.TeamRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.IdeaDto;
 import jakarta.transaction.Transactional;
+import org.hibernate.annotations.DialectOverride;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -98,5 +99,11 @@ public class IdeaService {
     @Transactional
     public void updateIdeaFields(Long teamId, String newField1,String newField2,String newField3){
         ir.updateIdeaFields(teamId,newField1,newField2,newField3);
+    }
+
+    public Idea findByIdeaId(Integer ideaId){
+        Optional<Idea> op=ir.findById(ideaId);
+        if(!op.isEmpty()) return op.get();
+        return null;
     }
 }

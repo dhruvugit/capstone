@@ -16,6 +16,8 @@ public interface UserService {
 	String removeUserByUserEmail(String userEmail);
 	User AddUserRole(User user, String role);
 
+	User findByUserId(Long id);
+
 	public Optional<User> updateUserRoleByEmail(String email, String role);
 
 
