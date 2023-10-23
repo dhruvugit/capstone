@@ -1,5 +1,6 @@
 package capstone.hackathon.capstone.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
 
+import capstone.hackathon.capstone.web.dto.TeamScoreResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
@@ -171,6 +173,24 @@ public class ImplementationService implements IfImplementationService{
 //			return response;
 //		}).collect(Collectors.toList());
 //	}
+
+
+
+
+	public List<TeamScoreResponse> getTeamScores() {
+		List<Implementation> implementations = implementationRepository.findAll();
+
+		List<TeamScoreResponse> teamScores = new ArrayList<>();
+
+		for (Implementation implementation : implementations) {
+			int sum = implementation.getScore().stream().mapToInt(Integer::intValue).sum();
+			TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), sum);
+			teamScores.add(teamScore);
+		}
+
+		return teamScores;
+	}
+
 
 	
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
+import capstone.hackathon.capstone.web.dto.TeamScoreResponse;
 import org.springframework.data.repository.query.Param;
 
 import capstone.hackathon.capstone.entities.Implementation;
@@ -24,8 +25,11 @@ public interface IfImplementationService {
 		
 		
 		public Implementation findImplementationByTeamId(Long teamId);
-//	public List<Map<String, Object>> getTeamScores();
+       //public List<Map<String, Object>> getTeamScores();
 	public void updateImplementationFields(Long teamId, String newField1, String newField2,String newField3, String newField4) ;
 		//public void updateScoreList(Long teamId, List<Integer> scoreList);
 
-		}
+
+	public List<TeamScoreResponse> getTeamScores();
+
+}

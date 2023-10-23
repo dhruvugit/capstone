@@ -10,6 +10,7 @@ import capstone.hackathon.capstone.repository.TeamRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
+import capstone.hackathon.capstone.web.dto.TeamScoreResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,12 +41,6 @@ public class ImplementationController {
 
 		
 	@Autowired IfImplementationService implementationService;
-
-    @PreAuthorize("hasAuthority('Role_Leader')" )
-	@PostMapping("/implementations")
-	public ResponseEntity<Implementation> createImplementation(@RequestBody Implementation implementation){
-		return new ResponseEntity<>(implementationService.createImplementation(implementation),HttpStatus.CREATED);
-	}
 
     @PostMapping("/submitImplementation")
     public ResponseEntity<?> submitImplementation(@RequestBody ImplementationDto implementationDto) {
@@ -127,16 +122,6 @@ public class ImplementationController {
         }
     }
 
-    @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
-	 @GetMapping("/implementations/team/{teamId}")
-	    public ResponseEntity<?> findImplementationByTeamId(@PathVariable Long teamId) {
-	        try {
-	            Implementation implementation = implementationService.findImplementationByTeamId(teamId);
-	            return ResponseEntity.ok(implementation);
-	        } catch (ImplementationNotFoundException e) {
-	            return ResponseEntity.notFound().build();
-	        }
-	    }
     @PreAuthorize("hasAuthority('Role_Leader')" )
     @PutMapping("/implementations/{implementationId}")
     public ResponseEntity<Implementation> updateImplementationById(@PathVariable int implementationId, @RequestBody ImplementationDto updatedImplementationDto) {
@@ -161,38 +146,6 @@ public class ImplementationController {
     }
 
 
-
-    @PreAuthorize("hasAuthority('Role_Leader')" )
-	@PutMapping("/implementations/team/{teamId}")
-    public ResponseEntity<String> updateImplementationFields(
-            @PathVariable Long teamId,
-            @RequestParam(name = "newgitHubURL") String newgitHubURL,
-            @RequestParam(name = "newrecordingURL") String newrecordingURL,
-            @RequestParam(name = "newpptURL") String newpptURL,
-            @RequestParam(name = "newdescription") String newdescription) {
-        try {
-            implementationService.updateImplementationFields(teamId, newgitHubURL, newrecordingURL, newpptURL, newdescription);
-
-            return ResponseEntity.ok("Fields updated successfully.");
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred:"+e.getMessage());
-        }
-    }
-
-//    @PreAuthorize("hasAuthority('Role_Judge') or hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
-//	@PutMapping("/update/{teamId}/score")
-//    public ResponseEntity<String> updateScoreList(
-//            @PathVariable Long teamId,
-//            @RequestParam(name = "scoreList") List<Integer> scoreList) {
-//
-//        // Call the service method to update the score list
-//        implementationService.updateScoreList(teamId, scoreList);
-//
-//        return ResponseEntity.ok("Score list updated successfully.");
-//    }
-
-
     @PreAuthorize("hasAuthority('Role_Judge') or hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
     @PostMapping("/implementations/addScores")
     public ResponseEntity<String> addScores(@RequestBody AddScoreDto addScoreDto) {
@@ -213,15 +166,12 @@ public class ImplementationController {
 		 }
 
 
+    @GetMapping("/teamScores")
+    public List<TeamScoreResponse> getTeamScores() {
+        List<TeamScoreResponse> teamScores = implementationService.getTeamScores(); // Replace 'yourService' with the actual service reference.
 
-//    @GetMapping("/team-scores")
-//    public ResponseEntity<?> getTeamScores() {
-//        try {
-//            return ResponseEntity.ok(implementationService.getTeamScores());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-//        }
-//    }
+        return teamScores;
+    }
 
 
 

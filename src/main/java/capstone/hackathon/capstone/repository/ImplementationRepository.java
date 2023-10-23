@@ -35,4 +35,30 @@ public interface ImplementationRepository extends JpaRepository<Implementation, 
 //            "ORDER BY i.implementationId")
 //    List<Object[]> getTeamScores();
 
+//    @Query("SELECT i, SUM(s.value) FROM Implementation i JOIN i.scores s GROUP BY i")
+//    List<Object[]> getTeamScores();
+
+//    @Query("SELECT i.team.teamId, SUM(s) FROM Implementation i JOIN i.score s GROUP BY i.team.teamId")
+//    List<Object[]> getTeamScores();
+
+
+//    @Query(
+//            value = "SELECT i.implementation_Id, i.GitHubURL, SUM(s) as totalScore " +
+//                    "FROM implementations i " +
+//                    "JOIN implementation_score s ON i.implementation_Id = s.implementation_implementation_Id " +
+//                    "GROUP BY i.implementation_Id",
+//            nativeQuery = true
+//    )
+//    List<Object[]> getTeamScores();
+
+
+//
+//
+//    @Query(value = "SELECT i.team_id, SUM(s) as totalScore FROM implementations i, unnest(cast(i.score as integer[])) s GROUP BY i.team_id", nativeQuery = true)
+//    List<Object[]> getTeamScores();
+
+
+
+
+
 }
