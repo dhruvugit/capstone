@@ -8,6 +8,35 @@ public class AddScoreDto {
     private String implementationId;
     private List<Integer> scores;
 
+
+    private String strengthFeedback;
+    private String weaknessFeedback;
+    private String developmentFeedback;
+
+    public String getStrengthFeedback() {
+        return strengthFeedback;
+    }
+
+    public void setStrengthFeedback(String strengthFeedback) {
+        this.strengthFeedback = strengthFeedback;
+    }
+
+    public String getWeaknessFeedback() {
+        return weaknessFeedback;
+    }
+
+    public void setWeaknessFeedback(String weaknessFeedback) {
+        this.weaknessFeedback = weaknessFeedback;
+    }
+
+    public String getDevelopmentFeedback() {
+        return developmentFeedback;
+    }
+
+    public void setDevelopmentFeedback(String developmentFeedback) {
+        this.developmentFeedback = developmentFeedback;
+    }
+
     public String getImplementationId() {
         return implementationId;
     }

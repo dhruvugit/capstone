@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
@@ -30,7 +31,11 @@ public class ImplementationService implements IfImplementationService{
 	@Autowired 
 	ImplementationRepository implementationRepository;
 	TeamRepository teamRepository;
-	
+
+	@Autowired
+	EmailService emailService;
+	@Autowired
+	UserService userService;
 	@Autowired
     public ImplementationService(ImplementationRepository implementationRepository, TeamRepository teamRepository) {
         this.implementationRepository = implementationRepository;
@@ -145,6 +150,7 @@ public class ImplementationService implements IfImplementationService{
 //         }
 //    }
 
+	@Override
 	public void addScores(AddScoreDto addScoreDto) {
 		String implementationId = addScoreDto.getImplementationId();
 		List<Integer> scores = addScoreDto.getScores();
@@ -154,7 +160,30 @@ public class ImplementationService implements IfImplementationService{
 		if (implementation != null) {
 			implementation.getScore().addAll(scores);
 			implementationRepository.save(implementation);
+
+			// Send the feedback via email to the leader
+			User user= userService.findByUserId(implementation.getTeam().getLeaderId());
+			String leaderEmail = user.getUserEmail();
+			String strengthFeedback = addScoreDto.getStrengthFeedback();
+			String weaknessFeedback = addScoreDto.getWeaknessFeedback();
+			String developmentFeedback = addScoreDto.getDevelopmentFeedback();
+
+			sendFeedbackEmail(leaderEmail, strengthFeedback, weaknessFeedback, developmentFeedback);
+		} else {
+			throw new ImplementationNotFoundException("No implementation found for ID: " + implementationId);
 		}
+	}
+
+
+	public void sendFeedbackEmail(String leaderEmail, String strengthFeedback, String weaknessFeedback, String developmentFeedback) {
+		// Assuming you have an EmailService with a sendMail method
+		String subject = "Feedback for Implementation";
+		String body = "Strengths: " + strengthFeedback + "\n" +
+				"Weaknesses: " + weaknessFeedback + "\n" +
+				"Development Areas: " + developmentFeedback;
+
+		// Send the email
+		emailService.sendMail(leaderEmail, subject, body);
 	}
 
 

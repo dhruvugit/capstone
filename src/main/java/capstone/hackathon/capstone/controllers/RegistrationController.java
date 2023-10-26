@@ -5,7 +5,6 @@ import capstone.hackathon.capstone.web.dto.MailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,16 +23,14 @@ public class RegistrationController {
 			
 	 @Autowired
 	 private PasswordEncoder passwordEncoder;
-	 
 
-	//@PreAuthorize("hasAuthority('Role_Admin') or hasAuthority('Role_User')")
-	    @PostMapping
+	    @PostMapping("/register")
 	 public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDto registrationDto) {
 	       
 	            // Call the UserService to register the user
 	        	System.out.println(registrationDto.toString());
 				registrationDto.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-				
+
 	            User registeredUser = userService.save(registrationDto);
 	            
 	            if (registeredUser != null) {
@@ -43,12 +40,18 @@ public class RegistrationController {
 	            } else {
 	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User registration failed.");
 	            }
-	        
-	        
-/*	        catch (Exception e) {
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
-	        }*/
+
 	    }
+
+
+		@PutMapping("/verifyEmail")
+		public ResponseEntity<String> verifyEmail(@RequestParam String email,@RequestParam String otp){
+			return new ResponseEntity<>(userService.verifyEmail(email,otp),HttpStatus.OK);
+		}
+		@PutMapping("/regenerate-otp")
+		public ResponseEntity<String> regenerateOtp(@RequestParam String email){
+			return new ResponseEntity<>(userService.regenerateOtp(email),HttpStatus.OK);
+		}
 	
 	
 	

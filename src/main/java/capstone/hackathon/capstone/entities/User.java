@@ -1,18 +1,10 @@
 package capstone.hackathon.capstone.entities;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
+
 @Entity
 @Table(name="USER_TABLE",uniqueConstraints = @UniqueConstraint(columnNames = {"username","userEmail"}))
 public class User {
@@ -24,8 +16,36 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private String userEmail;
+	@Column(name = "active")
+	private boolean active;
+	private String otp;
+	private LocalDateTime otpGeneratedTime;
 
-	  @JsonIgnore
+	public LocalDateTime getOtpGeneratedTime() {
+		return otpGeneratedTime;
+	}
+
+	public void setOtpGeneratedTime(LocalDateTime otpGeneratedTime) {
+		this.otpGeneratedTime = otpGeneratedTime;
+	}
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	@JsonIgnore
 	  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	  
 	  @JoinTable( name = "users_roles", joinColumns = @JoinColumn( name =

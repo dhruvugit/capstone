@@ -23,7 +23,7 @@ public class Implementation {
 		@Column(name="PPTURL")
 		private String pptURL;
 		
-		@Column(name="Descprition")
+		@Column(name="Description")
 		private String description;
 		
 		@ElementCollection

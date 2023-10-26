@@ -69,11 +69,14 @@ public class IdeaService {
     }
 
 
+
     public void updateStatus(Integer id, String status) throws IdeaNotFoundException {
         Idea idea = ir.findById(id).orElseThrow(() -> new IdeaNotFoundException("Idea with ID " + id + " not found"));
         idea.setStatus(status);
         ir.save(idea);
     }
+
+
 
 
 

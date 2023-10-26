@@ -17,6 +17,7 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
     @Query("SELECT i FROM Idea i JOIN i.team t WHERE t.teamId = :teamId")
     Optional<Idea> findIdeabyTeamId(Long teamId);
 
+
     //@Query("SELECT i FROM Idea i WHERE i.status IS NULL")
 //    List<Idea> findIdeasWithNullStatus();
 
@@ -47,4 +48,5 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
     @Query("SELECT i FROM Idea i JOIN i.team t WHERE t.teamId = :teamId")
     List<Idea> findByTeamId(Long teamId);
 
+    Idea findIdeaById(Integer id);
 }

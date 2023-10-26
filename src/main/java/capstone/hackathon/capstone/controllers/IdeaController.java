@@ -6,7 +6,9 @@ import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.exceptions.IdeaNotFoundException;
 import capstone.hackathon.capstone.repository.IdeaRepository;
 import capstone.hackathon.capstone.repository.TeamRepository;
+import capstone.hackathon.capstone.repository.UserRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.service.EmailService;
 import capstone.hackathon.capstone.service.IdeaService;
 import capstone.hackathon.capstone.entities.Idea;
 
@@ -34,7 +36,12 @@ public class IdeaController {
     private TeamRepository teamRepository;
 
     @Autowired
+    UserRepository userRepository;
+    @Autowired
     private IdeaService is;
+
+    @Autowired
+    EmailService emailService;
 
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')" )
     @GetMapping("/ideas/nullStatus")
@@ -145,6 +152,25 @@ public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
         }
     }
 
+//    @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')")
+//    @PutMapping("/ideas/updateStatus/{id}")
+//    public ResponseEntity<String> updateStatus(
+//            @PathVariable Integer id,
+//            @RequestBody ChangeStatusDto changeStatusDto) {
+//
+//        ResponseEntity<String> response;
+//        try {
+//            String status = changeStatusDto.getStatus();
+//            is.updateStatus(id, status);
+//            response = new ResponseEntity<>("Status updated successfully.", HttpStatus.OK);
+//        } catch (IdeaNotFoundException e) {
+//            response = new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+//        }
+//        return response;
+//    }
+
+
+
     @PreAuthorize("hasAuthority('Role_Panelist') or hasAuthority('Role_Leader') or hasAuthority('Role_User')")
     @PutMapping("/ideas/updateStatus/{id}")
     public ResponseEntity<String> updateStatus(
@@ -154,13 +180,51 @@ public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
         ResponseEntity<String> response;
         try {
             String status = changeStatusDto.getStatus();
+            String feedback = changeStatusDto.getFeedback();
+
             is.updateStatus(id, status);
-            response = new ResponseEntity<>("Status updated successfully.", HttpStatus.OK);
+
+            // Get the idea and team details
+            Idea idea = ideaRepository.findIdeaById(id);
+
+            if (idea.getTeam() != null) {
+                Long teamId = idea.getTeam().getTeamId();
+                Optional<Team> optionalTeam = teamRepository.findByTeamId(teamId);
+
+                if (optionalTeam.isPresent()) {
+                    Team team = optionalTeam.get();
+                    Long leaderId = team.getLeaderId();
+                    User leader = userRepository.findById(leaderId).orElse(null);
+
+                    if (leader != null) {
+                        // Send email to leader of the team
+                        String subject = "Feedback from Panelist";
+                        String message = "Feedback for idea '" + idea.getTitle() + "' :\n" + feedback;
+                        emailService.sendMail(leader.getUserEmail(), subject, message);
+                    }
+//
+////                     Send email to the participant
+//                    String participantEmail = idea.getParticipant().getEmail();
+//                    String participantSubject = "Idea Status Update";
+//                    String participantMessage = "Your idea '" + idea.getTitle() + "' has been " + status + " by the panelist.";
+//                    emailService.sendMail(participantEmail, participantSubject, participantMessage);
+
+                    response = new ResponseEntity<>("Status updated successfully. Emails sent.", HttpStatus.OK);
+                } else {
+                    response = new ResponseEntity<>("Team not found for the given idea.", HttpStatus.NOT_FOUND);
+                }
+            } else {
+                response = new ResponseEntity<>("No team associated with the given idea.", HttpStatus.NOT_FOUND);
+            }
         } catch (IdeaNotFoundException e) {
             response = new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         return response;
     }
+
+
+
+
 
 
 

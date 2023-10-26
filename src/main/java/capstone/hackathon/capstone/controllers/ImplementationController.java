@@ -146,11 +146,12 @@ public class ImplementationController {
     }
 
 
-    @PreAuthorize("hasAuthority('Role_Judge') or hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')" )
+
+    @PreAuthorize("hasAuthority('Role_Judge') or hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')")
     @PostMapping("/implementations/addScores")
     public ResponseEntity<String> addScores(@RequestBody AddScoreDto addScoreDto) {
         implementationService.addScores(addScoreDto);
-        return new ResponseEntity<>("Scores added successfully.", HttpStatus.OK);
+        return new ResponseEntity<>("Scores and feedback added successfully.", HttpStatus.OK);
     }
 
 

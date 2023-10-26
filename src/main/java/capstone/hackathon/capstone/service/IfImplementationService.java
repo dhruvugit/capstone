@@ -30,6 +30,7 @@ public interface IfImplementationService {
 		//public void updateScoreList(Long teamId, List<Integer> scoreList);
 
 
+	public void sendFeedbackEmail(String leaderEmail, String strengthFeedback, String weaknessFeedback, String developmentFeedback);
 	public List<TeamScoreResponse> getTeamScores();
 
 }
