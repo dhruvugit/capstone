@@ -3,13 +3,13 @@ package capstone.hackathon.capstone.controllers;
 import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.entities.User;
-import capstone.hackathon.capstone.service.EmailService;
-import capstone.hackathon.capstone.service.IdeaService;
-import capstone.hackathon.capstone.service.PanelistService;
-import capstone.hackathon.capstone.service.UserService;
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
+import capstone.hackathon.capstone.service.*;
 import capstone.hackathon.capstone.web.dto.MailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +30,10 @@ public class PanelistController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private AssignmentService assignmentService;
+    // get by Panelist Id
     @GetMapping("/nullIdeas")
     public List<Idea> getNullStatusIdeas() {
         return ideaService.getNullStatusIdeas();
@@ -50,5 +54,15 @@ public class PanelistController {
                 emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaSelection);
         }
         return ResponseEntity.ok("Idea status updated successfully");
+    }
+
+    @GetMapping("/viewIdeas")
+    public List<Idea> viewIdeas()
+    {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+        List<Idea> ideas= assignmentService.getByPanelistId(user.getId());
+        return ideas;
     }
 }

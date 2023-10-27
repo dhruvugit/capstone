@@ -1,5 +1,6 @@
 package capstone.hackathon.capstone.controllers;
 
+import capstone.hackathon.capstone.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.service.UserService;
 import capstone.hackathon.capstone.web.dto.UserRoleRequestDto;
 
+import java.util.List;
 import java.util.Optional;
 @CrossOrigin("*")
 @RestController
@@ -17,6 +19,8 @@ import java.util.Optional;
 public class AdminController {
 	@Autowired
 	private UserService userService;
+    @Autowired
+    private AssignmentService assignmentService;
 
 
     @PreAuthorize("hasAuthority('Role_Admin')" )
@@ -37,7 +41,19 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or invalid request");
     }
 
+    @GetMapping("/getPanelists")
+    public List<User> getPanelists()
+    {
+        List<User> panelist=userService.getAllPanelists();
+        return panelist;
+    }
 
+    @GetMapping("/assignIdeasToPanelists")
+    public ResponseEntity<String> assignIdeas()
+    {
+        String response=assignmentService.assignIdeas();
+        return ResponseEntity.ok(response);
+    }
 	/*
 	 * @Autowired private RoleService roleService;
 	 */

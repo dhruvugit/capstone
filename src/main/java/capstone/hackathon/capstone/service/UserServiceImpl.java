@@ -8,6 +8,8 @@ import java.util.List;
 import capstone.hackathon.capstone.web.dto.OtpUtil;
 import capstone.hackathon.capstone.web.dto.ResetPasswordDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.repository.RoleRepository;
 import capstone.hackathon.capstone.repository.UserRepository;
 import capstone.hackathon.capstone.web.dto.UserRegistrationDto;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -225,8 +228,10 @@ public class UserServiceImpl implements UserService{
 
 		return "Password reset successful.";
 	}
-
-
+	public List<User> getAllPanelists() {
+		List<User> panelists = userRepository.findUsersByRoleName("Role_Panelist");
+		return panelists;
+	}
 
 
 }

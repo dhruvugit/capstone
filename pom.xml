@@ -138,11 +138,11 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<artifactSet>
+<!--							<artifactSet>
 								<excludes>
 									<exclude>org.apache.tomcat.embed:*</exclude>
 								</excludes>
-							</artifactSet>
+							</artifactSet>-->
 						</configuration>
 					</execution>
 				</executions>

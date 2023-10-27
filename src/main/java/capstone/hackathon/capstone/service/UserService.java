@@ -16,6 +16,7 @@ public interface UserService {
 	//String removeUserByUsername(String username);
 	String removeUserByUserEmail(String userEmail);
 	public String resetPassword(ResetPasswordDto resetPasswordDto);
+	public List<User> getAllPanelists();
 	User AddUserRole(User user, String role);
 
 	User findByUserId(Long id);
