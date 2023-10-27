@@ -35,7 +35,7 @@ public class RegistrationController {
 	            
 	            if (registeredUser != null) {
 					MailMessages mailMessages = new MailMessages();
-					emailService.sendMail(registeredUser.getUserEmail(),"Welcome to iHackathon!", mailMessages.getRegistrationSuccessfull());
+					//emailService.sendMail(registeredUser.getUserEmail(),"Welcome to iHackathon!", mailMessages.getRegistrationSuccessfull());
 	                return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
 	            } else {
 	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User registration failed.");

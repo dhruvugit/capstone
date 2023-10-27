@@ -39,13 +39,31 @@ public class UserServiceImpl implements UserService{
 	 * public UserServiceImpl(UserRepository userRepository, RoleRepository
 	 * roleRepository) { super(); this.userRepository = userRepository;
 	 * this.roleRepository = roleRepository; }
+	 *
+	 *
 	 */
+
+
+	public String registrationSuccessfullpre=  "Hi! Welcome to iHackathon.Your account has been successfully created.Your personal activation code is :  ";
+	public String registrationSuccessfullsuff = "Please verify your account using above otp before login in to iHacakthon portal ";
 	@Override
 	public User save(UserRegistrationDto registrationDto) {
 		// TODO Auto-generated method stub
 		System.out.println(registrationDto.toString());
 		String otp=otpUtil.generateOtp();
-		emailService.sendMail(registrationDto.getEmail(),"Email verification OTP","The OTP for email verification is "+otp);
+		emailService.sendMail(
+				registrationDto.getEmail(),
+				"iHackathon Email Verification OTP",
+				"   Dear " + registrationDto.getFirstName() + ",\n\n" +
+						"   Welcome to iHackathon! We're excited to have you on board. Before you can get started, we need to verify your email address.\n\n" +
+						"   Please use the following OTP to verify your email address:\n" + otp + "\n\n" +
+						"   Once your email address is verified, you'll be able to log in and start exploring the platform.\n\n" +
+						"   If you didn't request this OTP, please ignore this email.\n\n" +
+						"   Regards,\n" +
+						"   Team iHackathon"
+		);
+
+
 		Role role= new Role("Role_User");
 		List<Role> defaultRole= new ArrayList<Role>();
 		defaultRole.add(role);

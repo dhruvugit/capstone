@@ -198,18 +198,36 @@ public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
 
                     if (leader != null) {
                         // Send email to leader of the team
-                        String subject = "Feedback from Panelist";
-                        String message = "Feedback for idea '" + idea.getTitle() + "' :\n" + feedback;
+                        String subject = "Feedback and Status Update";
+                        String message;
+
+                        if (status.equalsIgnoreCase("approved")) {
+                            message = "Congratulations on the approval of your idea!\n\n" +
+                                    "Idea Title: " + idea.getTitle() + "\n" +
+                                    "Feedback: " + feedback + "\n\n" +
+                                    "You have successfully advanced to the next round. Please proceed by submitting " +
+                                    "the implementation details (code, presentation, recording) uploaded on your google drive account.\n\n" +
+
+                                    "Best regards,\n" +
+                                    "Team iHackathon";
+                        } else if (status.equalsIgnoreCase("rejected")) {
+                            message = "We appreciate your effort and creativity!\n\n" +
+                                    "Idea Title: " + idea.getTitle() + "\n" +
+                                    "Feedback: " + feedback + "\n\n" +
+                                    "Although your idea was not selected this time, we encourage you to continue " +
+                                    "innovating and participating in future events. Your ideas have great potential!\n\n" +
+                                    "Best regards,\n" +
+                                    "Team iHackathon";
+                        } else {
+                            message = "Idea Title: " + idea.getTitle() + "\n" +
+                                    "Feedback: " + feedback + "\n\n" +
+                                    "Status: " + status;
+                        }
+
                         emailService.sendMail(leader.getUserEmail(), subject, message);
                     }
-//
-////                     Send email to the participant
-//                    String participantEmail = idea.getParticipant().getEmail();
-//                    String participantSubject = "Idea Status Update";
-//                    String participantMessage = "Your idea '" + idea.getTitle() + "' has been " + status + " by the panelist.";
-//                    emailService.sendMail(participantEmail, participantSubject, participantMessage);
 
-                    response = new ResponseEntity<>("Status updated successfully. Emails sent.", HttpStatus.OK);
+                    response = new ResponseEntity<>("Status updated successfully. Email sent.", HttpStatus.OK);
                 } else {
                     response = new ResponseEntity<>("Team not found for the given idea.", HttpStatus.NOT_FOUND);
                 }
@@ -221,6 +239,8 @@ public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
         }
         return response;
     }
+
+
 
 
 

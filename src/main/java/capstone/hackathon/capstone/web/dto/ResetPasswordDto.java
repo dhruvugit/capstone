@@ -1,5 +1,7 @@
 package capstone.hackathon.capstone.web.dto;
 
+
+
 public class ResetPasswordDto {
 	private String username;
 	private String otp;
