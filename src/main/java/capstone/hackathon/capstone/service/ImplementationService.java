@@ -147,23 +147,58 @@ public class ImplementationService implements IfImplementationService{
 //         }
 //    }
 
+//	@Override
+//	public void addScores(AddScoreDto addScoreDto) {
+//		String implementationId = addScoreDto.getImplementationId();
+//		List<Integer> scores = addScoreDto.getScores();
+//
+//		Implementation implementation = implementationRepository.findById(Integer.parseInt(implementationId)).orElse(null);
+//
+//		if (implementation != null) {
+//			implementation.getScore().addAll(scores);
+//			implementationRepository.save(implementation);
+//
+//			// Send the feedback via email to the leader
+//			User user= userService.findByUserId(implementation.getTeam().getLeaderId());
+//			String leaderEmail = user.getUserEmail();
+//			String strengthFeedback = addScoreDto.getStrengthFeedback();
+//			String weaknessFeedback = addScoreDto.getWeaknessFeedback();
+//			String developmentFeedback = addScoreDto.getDevelopmentFeedback();
+//
+//			sendFeedbackEmail(leaderEmail, strengthFeedback, weaknessFeedback, developmentFeedback);
+//		} else {
+//			throw new ImplementationNotFoundException("No implementation found for ID: " + implementationId);
+//		}
+//	}
+
+
+
 	@Override
 	public void addScores(AddScoreDto addScoreDto) {
 		String implementationId = addScoreDto.getImplementationId();
-		List<Integer> scores = addScoreDto.getScores();
 
 		Implementation implementation = implementationRepository.findById(Integer.parseInt(implementationId)).orElse(null);
 
 		if (implementation != null) {
-			implementation.getScore().addAll(scores);
+			int strengthScore = addScoreDto.getTechnicalProficiencyScore();
+			int weaknessScore = addScoreDto.getPresentationAndCommunicationScore();
+			int developmentScore = addScoreDto.getPresentationAndCommunicationScore();
+
+			// Add scores to the list
+			implementation.getScore().add(strengthScore);
+			implementation.getScore().add(weaknessScore);
+			implementation.getScore().add(developmentScore);
+
+			// Save the implementation
 			implementationRepository.save(implementation);
 
+			// Send feedback via email to the leader
 			// Send the feedback via email to the leader
 			User user= userService.findByUserId(implementation.getTeam().getLeaderId());
 			String leaderEmail = user.getUserEmail();
 			String strengthFeedback = addScoreDto.getStrengthFeedback();
-			String weaknessFeedback = addScoreDto.getWeaknessFeedback();
-			String developmentFeedback = addScoreDto.getDevelopmentFeedback();
+			String weaknessFeedback = addScoreDto.getImprovementAreaFeedback();
+			String developmentFeedback = addScoreDto.getDevelopmentRecommendationsFeedback();
 
 			sendFeedbackEmail(leaderEmail, strengthFeedback, weaknessFeedback, developmentFeedback);
 		} else {
@@ -172,12 +207,16 @@ public class ImplementationService implements IfImplementationService{
 	}
 
 
+
+
+
+
 	public void sendFeedbackEmail(String leaderEmail, String strengthFeedback, String weaknessFeedback, String developmentFeedback) {
 		// Assuming you have an EmailService with a sendMail method
 		String subject = "Feedback for Implementation";
 		String body = "Strengths: " + strengthFeedback + "\n" +
-				"Weaknesses: " + weaknessFeedback + "\n" +
-				"Development Areas: " + developmentFeedback;
+				"Improvement Areas: " + weaknessFeedback + "\n" +
+				"Development Recommendations: " + developmentFeedback;
 
 		// Send the email
 		emailService.sendMail(leaderEmail, subject, body);

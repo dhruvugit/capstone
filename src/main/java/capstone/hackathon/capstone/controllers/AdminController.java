@@ -1,6 +1,7 @@
 package capstone.hackathon.capstone.controllers;
 
 import capstone.hackathon.capstone.service.AssignmentService;
+import capstone.hackathon.capstone.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,8 @@ public class AdminController {
 	private UserService userService;
     @Autowired
     private AssignmentService assignmentService;
-
+    @Autowired
+    private EmailService emailService;
 
     @PreAuthorize("hasAuthority('Role_Admin')" )
     @PutMapping("/updateRole")
@@ -93,7 +95,50 @@ public class AdminController {
 //            return ResponseEntity.notFound().build();
 //        }
 //	}
+@GetMapping("/sendReminderToPanelists")
+    public ResponseEntity<String>sendReminder(){
+    List<User> panelists= userService.getAllPanelists();
+    for(User panelist:panelists)
+    {
+        emailService.sendMail(
+                panelist.getUserEmail(),
+                "Reminder: Pending Idea Evaluations",
+                "Dear " + panelist.getFirstName() + ",\n\n" +
+                        "We hope this message finds you well.\n\n" +
+                        "This is a friendly reminder to complete your pending idea evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
+                        "Please ensure that you finish the evaluations before the deadline.\n\n" +
+                        "Thank you for your time and contribution!\n\n" +
+                        "Best regards,\n" +
+                        "Team iHackathon"
+        );
 
+    }
+    return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
+}
+
+
+
+
+    @GetMapping("/sendReminderToJudges")
+    public ResponseEntity<String>sendRemindertoJudge(){
+        List<User> judges= userService.getAllJudges();
+        for(User judge:judges)
+        {
+            emailService.sendMail(
+                    judge.getUserEmail(),
+                    "Reminder: Pending Idea Evaluations",
+                    "Dear " + judge.getFirstName() + ",\n\n" +
+                            "We hope this message finds you well.\n\n" +
+                            "This is a friendly reminder to complete your pending idea implementation evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
+                            "Please ensure that you finish the evaluations before the deadline.\n\n" +
+                            "Thank you for your time and contribution!\n\n" +
+                            "Best regards,\n" +
+                            "Team iHackathon"
+            );
+
+        }
+        return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
+    }
 
 
 

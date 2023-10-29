@@ -6,6 +6,7 @@ import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.repository.AssignedIdeasRepository;
 import capstone.hackathon.capstone.repository.IdeaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +16,9 @@ import java.util.Random;
 
 @Service
 public class AssignmentService {
+
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -61,6 +65,18 @@ public class AssignmentService {
             }
 
             // Set the assigned ideas for this panelist
+            emailService.sendMail(panelist.getUserEmail(),
+                    "Ideas Assigned for Evaluation",
+                    "Dear " + panelist.getFirstName() + ",\n\n" +
+                            "We hope this message finds you well.\n\n" +
+                            "We are pleased to inform you that a set of ideas have been assigned to you for evaluation. We kindly request you to evaluate these ideas in a timely manner. Please consider the following points while evaluating:\n" +
+                            "Your valuable feedback is essential for us to make informed decisions. Please provide clear and constructive feedback for each idea, including any strengths, weaknesses, and potential areas for improvement.\n\n" +
+                            "We appreciate your prompt attention to this matter.\n\n" +
+                            "If you encounter any challenges or have any questions during the evaluation process, please do not hesitate to reach out to us.\n\n" +
+                            "Regards,\n" +
+                            "Team iHackathon"
+                            );
+
 
 
             // Optionally, you can save this assignment in your database
@@ -79,4 +95,10 @@ public class AssignmentService {
         return ideas;
 
     }
+
+
+       // Inject AssignmentService for access to assigned ideas
+
+
 }
+

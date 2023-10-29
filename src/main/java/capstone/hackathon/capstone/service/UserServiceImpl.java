@@ -233,6 +233,12 @@ public class UserServiceImpl implements UserService{
 		return panelists;
 	}
 
+	@Override
+	public List<User> getAllJudges() {
+		List<User> judges = userRepository.findUsersByRoleName("Role_Judge");
+		return judges;
+	}
+
 
 }
 	
