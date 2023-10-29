@@ -122,21 +122,27 @@
 		<!--         edited part end-->
 	</dependencies>
 
-	<build>
+	
+<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.4.1</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<mainClass>capstone.hackathon.capstone.CapstoneApplication</mainClass>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>repackage</goal>
 						</goals>
+
 						<configuration>
 <!--							<artifactSet>
 								<excludes>
@@ -144,13 +150,16 @@
 								</excludes>
 							</artifactSet>-->
 						</configuration>
+
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
-
-
 
 
 </project>
