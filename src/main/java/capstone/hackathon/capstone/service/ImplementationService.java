@@ -1,9 +1,6 @@
 package capstone.hackathon.capstone.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import capstone.hackathon.capstone.entities.User;
@@ -206,19 +203,20 @@ public class ImplementationService implements IfImplementationService{
 
 
 
+
 	public List<TeamScoreResponse> getTeamScores() {
 		List<Implementation> implementations = implementationRepository.findAll();
-
 		List<TeamScoreResponse> teamScores = new ArrayList<>();
-
 		for (Implementation implementation : implementations) {
 			int sum = implementation.getScore().stream().mapToInt(Integer::intValue).sum();
 			TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), sum);
 			teamScores.add(teamScore);
 		}
-
+		teamScores.sort(Comparator.comparingInt(TeamScoreResponse::getScore).reversed());
 		return teamScores;
+
 	}
+
 
 
 	
