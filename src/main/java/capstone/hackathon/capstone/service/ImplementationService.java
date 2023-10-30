@@ -182,7 +182,7 @@ public class ImplementationService implements IfImplementationService{
 		if (implementation != null) {
 			int strengthScore = addScoreDto.getTechnicalProficiencyScore();
 			int weaknessScore = addScoreDto.getPresentationAndCommunicationScore();
-			int developmentScore = addScoreDto.getPresentationAndCommunicationScore();
+			int developmentScore = addScoreDto.getCreativityAndInnovationScore();
 
 			// Add scores to the list
 			implementation.getScore().add(strengthScore);
@@ -248,15 +248,40 @@ public class ImplementationService implements IfImplementationService{
 		List<TeamScoreResponse> teamScores = new ArrayList<>();
 		for (Implementation implementation : implementations) {
 			int sum = implementation.getScore().stream().mapToInt(Integer::intValue).sum();
-			TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), sum);
+			Double average= (double) (sum/implementation.getScore().size());
+			TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), average);
 			teamScores.add(teamScore);
 		}
-		teamScores.sort(Comparator.comparingInt(TeamScoreResponse::getScore).reversed());
+		teamScores.sort(Comparator.comparingDouble(TeamScoreResponse::getScore).reversed());
 		return teamScores;
 
 	}
 
 
 
-	
+//	public List<TeamScoreResponse> getTeamScores() {
+//		List<Implementation> implementations = implementationRepository.findAll();
+//		List<TeamScoreResponse> teamScores = new ArrayList<>();
+//
+//		for (Implementation implementation : implementations) {
+//			List<Integer> scores = implementation.getScore();
+//			int numJudges = scores.size() / 3; // Assuming each judge provides 3 scores
+//
+//			if (numJudges > 0) {
+//				int totalScore = scores.stream().mapToInt(Integer::intValue).sum();
+//				double normalizedScore = (double) totalScore / numJudges;
+//
+//				TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), (int) Math.round(normalizedScore));
+//				teamScores.add(teamScore);
+//			}
+//		}
+//
+//		teamScores.sort(Comparator.comparingInt(TeamScoreResponse::getScore).reversed());
+//		return teamScores;
+//	}
+
+
+
+
+
 }

@@ -1,10 +1,12 @@
 package capstone.hackathon.capstone.web.dto;
 
+import java.util.OptionalDouble;
+
 public class TeamScoreResponse {
     private String teamName;
-    private int score;
+    private Double score;
 
-    public TeamScoreResponse(String teamName, int score) {
+    public TeamScoreResponse(String teamName, Double score) {
         this.teamName = teamName;
         this.score = score;
     }
@@ -17,11 +19,11 @@ public class TeamScoreResponse {
         this.teamName = teamName;
     }
 
-    public int getScore() {
+    public Double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 }

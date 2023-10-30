@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class AssignmentService {
@@ -35,7 +32,7 @@ public class AssignmentService {
         return "Ideas have been assigned to the panelists successfully!";
     }
 
-    private void assignmentAlgorithm(List<User> panelists, List<Idea> ideas) {
+    public void assignmentAlgorithm(List<User> panelists, List<Idea> ideas) {
 
         Collections.shuffle(ideas, new Random());
 
@@ -45,7 +42,6 @@ public class AssignmentService {
         int ideaIndex = 0;
 
         for (User panelist : panelists) {
-
 
             // Assign an equal share of ideas to each panelist
             for (int i = 0; i < ideasPerPanelist; i++) {
@@ -85,6 +81,33 @@ public class AssignmentService {
 
     }
 
+    public void updateAssignedIdeaStatus(AssignedIdeas assignedIdeas, String status){
+        assignedIdeas.setStatus(status);
+        assignedIdeasRepository.save(assignedIdeas);
+    }
+
+//    public AssignedIdeas findByIdeaId(int id){
+//        // AssignedIdeas idea=AssignedIdeasRepository.;
+//         List<AssignedIdeas> idea = AssignedIdeasRepository.findByIdeaId(id);
+//          return idea.get(0);;
+//
+//          //not audible baad mein hee karte hain
+//    }
+
+
+//    public AssignedIdeas findByIdeaId(int id)
+//    {return AssignedIdeasRepository.findByIdeaId().get(0);}
+
+    public AssignedIdeas findByIdeaId(int id)
+    {
+        Optional<AssignedIdeas> obj= assignedIdeasRepository.findByIdeaId(id);
+        if(!obj.isEmpty())
+        {
+            return obj.get();
+        }
+        return null;
+    }
+
     public List<Idea> getByPanelistId(Long id) {
         List<AssignedIdeas> obj=assignedIdeasRepository.findByPanelistId(id);
         List<Idea> ideas= new ArrayList<>();
@@ -95,6 +118,16 @@ public class AssignmentService {
         return ideas;
 
     }
+
+
+
+
+    public List<AssignedIdeas> findAssignedIdeasByPanelistId(Long id)
+    {
+        return assignedIdeasRepository.findByPanelistId(id);
+    }
+
+
 
 
        // Inject AssignmentService for access to assigned ideas

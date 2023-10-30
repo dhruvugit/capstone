@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
+import capstone.hackathon.capstone.exceptions.UserNotFoundException;
 import capstone.hackathon.capstone.web.dto.OtpUtil;
 import capstone.hackathon.capstone.web.dto.ResetPasswordDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,19 +119,59 @@ public class UserServiceImpl implements UserService{
 		
 	}
 
+
+
 	@Override
-	public User removeUserRole(User user, String role) {
+	public User AddUserRole(User user, String role) {
 		// TODO Auto-generated method stub
-	        // Find the role by its ID (or any other unique identifier)
+		/*
+		 * User existingUser = userRepository.findById(user.getId()).orElse(null);
+		 *
+		 * // Find the role by its ID (or any other unique identifier) Role existingRole
+		 * = roleRepository.findById(role.getId()).orElse(null);
+		 *
+		 * // Check if both the user and role exist if (existingUser != null &&
+		 * existingRole != null) {
+		 */
+		// Add the role to the user's roles
+		List<Role> existingRoles=user.getRoles();
+		Role r=new Role(role);
+		existingRoles.add(r);
+		user.setRoles(existingRoles);
+		return userRepository.save(user);
 
-	        // Check if both the user and role exist
-		 	List<Role> existingRoles=user.getRoles();
-		 		existingRoles.remove(role);
-				user.setRoles(existingRoles);
 
+
+	}
+
+//	@Override
+//	public User removeUserRole(User user, String role) {
+//		// TODO Auto-generated method stub
+//	        // Find the role by its ID (or any other unique identifier)
+//		Role roleToRemove=new Role(role);
+//		List<Role> existingRoles= user.getRoles();
+//		existingRoles.remove(role);
+//		user.setRoles(existingRoles);
+//	        // Check if both the user and role exist
+//			return userRepository.save(user);
+//	    }
+
+	public User removeRoleFromUserByEmail(String userEmail, String roleName) {
+		User user = findByUserEmail(userEmail);
+
+		if (user != null) {
+			List<Role> roles = user.getRoles();
+			roles.removeIf(role -> role.getName().equals(roleName));
+			user.setRoles(roles);
 
 			return userRepository.save(user);
-	    }
+		} else {
+			throw new UserNotFoundException("User not found with email: " + userEmail);
+		}
+	}
+
+
+
 
 	public Optional<User> updateUserRoleByEmail(String email, String roleName) {
 		Optional<User> optionalUser = userRepository.findByUserEmail(email);
@@ -170,28 +211,6 @@ public class UserServiceImpl implements UserService{
 	}
 
 
-	@Override
-	public User AddUserRole(User user, String role) {
-		// TODO Auto-generated method stub
-		/*
-		 * User existingUser = userRepository.findById(user.getId()).orElse(null);
-		 *
-		 * // Find the role by its ID (or any other unique identifier) Role existingRole
-		 * = roleRepository.findById(role.getId()).orElse(null);
-		 *
-		 * // Check if both the user and role exist if (existingUser != null &&
-		 * existingRole != null) {
-		 */
-		// Add the role to the user's roles
-		List<Role> existingRoles=user.getRoles();
-		Role r=new Role(role);
-		existingRoles.add(r);
-		user.setRoles(existingRoles);
-		return userRepository.save(user);
-
-
-
-	}
 
 	@Override
 	public User findByUserId(Long id) {

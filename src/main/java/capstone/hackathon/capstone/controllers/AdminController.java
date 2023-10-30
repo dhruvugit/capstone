@@ -1,7 +1,11 @@
 package capstone.hackathon.capstone.controllers;
 
+import capstone.hackathon.capstone.entities.AssignedIdeas;
+import capstone.hackathon.capstone.entities.Idea;
+import capstone.hackathon.capstone.entities.Role;
 import capstone.hackathon.capstone.service.AssignmentService;
 import capstone.hackathon.capstone.service.EmailService;
+import capstone.hackathon.capstone.service.IdeaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +17,7 @@ import capstone.hackathon.capstone.service.UserService;
 import capstone.hackathon.capstone.web.dto.UserRoleRequestDto;
 
 import java.util.List;
+import java.util.*;
 import java.util.Optional;
 @CrossOrigin("*")
 @RestController
@@ -20,6 +25,10 @@ import java.util.Optional;
 public class AdminController {
 	@Autowired
 	private UserService userService;
+
+    @Autowired
+    private IdeaService ideaService;
+
     @Autowired
     private AssignmentService assignmentService;
     @Autowired
@@ -56,27 +65,9 @@ public class AdminController {
         String response=assignmentService.assignIdeas();
         return ResponseEntity.ok(response);
     }
-	/*
-	 * @Autowired private RoleService roleService;
-	 */
-//	@PreAuthorize("hasAuthority('Role_Admin')")
-//	@PostMapping("/addRoletoUser")
-//    public ResponseEntity<User> addUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
-//        String userEmail = userRoleRequest.getUserEmail();
-//        String roleName = userRoleRequest.getRole();
-//
-//		User existingUser = userService
-//				.findByUsername(userEmail);
-//
-//        if (existingUser != null) {
-//            User updatedUser = userService.AddUserRole(existingUser, roleName);
-//            return ResponseEntity.ok(updatedUser);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
 
-//
+
+
 //    @PreAuthorize("hasAuthority('Role_Admin')")
 //    @PostMapping("/removeRolefromUser")
 //    public ResponseEntity<User> removeUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
@@ -85,7 +76,6 @@ public class AdminController {
 //
 //        User existingUser = userService.findByUserEmail(userEmail);
 //
-//        existingUser.setRoles(roleName);
 //
 //        if (existingUser != null ) {
 //            // Remove the role from the user's roles
@@ -95,7 +85,26 @@ public class AdminController {
 //            return ResponseEntity.notFound().build();
 //        }
 //	}
-@GetMapping("/sendReminderToPanelists")
+
+
+
+
+    @PreAuthorize("hasAuthority('Role_Admin')")
+    @PutMapping("/removeRolefromUser")
+    public ResponseEntity<User> removeUserRole(@RequestBody UserRoleRequestDto userRoleRequest) {
+        String userEmail = userRoleRequest.getUserEmail();
+        String roleName = userRoleRequest.getRole();
+
+        User updatedUser = userService.removeRoleFromUserByEmail(userEmail, roleName);
+
+        if (updatedUser != null) {
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/sendReminderToPanelists")
     public ResponseEntity<String>sendReminder(){
     List<User> panelists= userService.getAllPanelists();
     for(User panelist:panelists)
@@ -138,6 +147,37 @@ public class AdminController {
 
         }
         return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
+    }
+
+
+
+    @GetMapping("/checkPanelistProgress")
+    public List<AssignedIdeas> checkPanelistProgress(String panelistEmail)
+    {
+        List<AssignedIdeas> ideas=new ArrayList<>();
+        User panelist= userService.findByUserEmail(panelistEmail);
+        if(panelist!=null)
+        {
+            return assignmentService.findAssignedIdeasByPanelistId(panelist.getId());
+        }
+        else return null;
+
+    }
+
+    @GetMapping("/assignIdeasToOtherPanelists")
+    public ResponseEntity<String> assignIdeasToOtherPanelists(@RequestParam String panelistEmail)
+    {   userService.removeRoleFromUserByEmail(panelistEmail, "Role_Panelist");
+        List<User> panelists=userService.getAllPanelists();
+        List<Idea> ideas=new ArrayList<>();
+        User panelist= userService.findByUserEmail(panelistEmail);
+        List<AssignedIdeas> assignedIdeas=assignmentService.findAssignedIdeasByPanelistId(panelist.getId());
+        for(AssignedIdeas idea:assignedIdeas)
+        {
+            Idea i=ideaService.getIdeaById(idea.getIdeaId());
+            ideas.add(i);
+        }
+        assignmentService.assignmentAlgorithm(panelists,ideas);
+        return ResponseEntity.ok("Ideas have been assigned to the rest of the panelists.");
     }
 
 

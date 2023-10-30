@@ -14,3 +14,4 @@ public interface RoleRepository extends JpaRepository<Role, Long>{
 	//Optional<User> findByUserEmail(String userEmail);
 }
 
+//list of roles-- users_roles role,userId()-delete

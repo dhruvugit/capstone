@@ -12,7 +12,15 @@ public class AssignedIdeas {
     private int id;
     private Long panelistId;
     private int ideaId;
+    private String status;
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public AssignedIdeas(){
         super();
@@ -20,6 +28,7 @@ public class AssignedIdeas {
     public AssignedIdeas(Long panelistId, int ideaId) {
         this.panelistId = panelistId;
         this.ideaId = ideaId;
+
     }
 
     public int getId() {

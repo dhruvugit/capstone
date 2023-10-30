@@ -12,14 +12,15 @@ public interface UserService {
 	User save(UserRegistrationDto registrationDto);
 	User findByUsername(String username);
 	User findByUserEmail(String userEmail);
-	User removeUserRole(User user,String role);
+	//User removeUserRole(User user,String role);
+	public User removeRoleFromUserByEmail(String userEmail, String roleName);
 	//String removeUserByUsername(String username);
 	String removeUserByUserEmail(String userEmail);
 	public String resetPassword(ResetPasswordDto resetPasswordDto);
 
 	public List<User> getAllPanelists();
 	public List<User> getAllJudges();
-	User AddUserRole(User user, String role);
+	public User AddUserRole(User user, String role);
 
 	User findByUserId(Long id);
 

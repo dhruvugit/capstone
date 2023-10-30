@@ -49,4 +49,5 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
     List<Idea> findByTeamId(Long teamId);
 
     Idea findIdeaById(Integer id);
+
 }

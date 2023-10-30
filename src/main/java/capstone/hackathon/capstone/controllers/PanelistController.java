@@ -1,5 +1,6 @@
 package capstone.hackathon.capstone.controllers;
 
+import capstone.hackathon.capstone.entities.AssignedIdeas;
 import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.Team;
 import capstone.hackathon.capstone.entities.User;
@@ -39,8 +40,11 @@ public class PanelistController {
         return ideaService.getNullStatusIdeas();
     }
 
+
     @PostMapping("/updateStatus")
     public ResponseEntity<String> updateIdeaStatus(@RequestParam int ideaId, @RequestParam String status) {
+        AssignedIdeas assignedIdea=assignmentService.findByIdeaId(ideaId);
+        if(assignedIdea!=null) assignmentService.updateAssignedIdeaStatus(assignedIdea,status);
         ideaService.updateIdeaStatus(ideaId, status);
         Idea idea=is.findByIdeaId(ideaId);
         if(idea!=null)
@@ -49,7 +53,7 @@ public class PanelistController {
             User leader= userService.findByUserId(team.getLeaderId());
             MailMessages mailMessages= new MailMessages();
             if(status=="Rejected")
-            emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaRejection);
+                emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaRejection);
             if(status=="Approved")
                 emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaSelection);
         }

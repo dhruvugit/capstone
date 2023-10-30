@@ -22,9 +22,15 @@ public class TeamServiceImpl implements TeamService{
     
     @Autowired
     private TeamMembersRepository tmr;
+
+
+
     
     @Autowired
     private UserService us;
+
+
+
 	@Override
 	public Team registerTeam(RegisterTeamDto registerTeamDto) {
 		// TODO Auto-generated method stub
