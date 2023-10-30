@@ -1,5 +1,6 @@
 package capstone.hackathon.capstone.service;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -242,19 +243,42 @@ public class ImplementationService implements IfImplementationService{
 
 
 
+//
+//	public List<TeamScoreResponse> getTeamScores() {
+//		List<Implementation> implementations = implementationRepository.findAll();
+//		List<TeamScoreResponse> teamScores = new ArrayList<>();
+//		for (Implementation implementation : implementations) {
+//			int sum = implementation.getScore().stream().mapToInt(Integer::intValue).sum();
+//			Double average= (double) (sum/implementation.getScore().size());
+//			TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), average);
+//			teamScores.add(teamScore);
+//		}
+//		teamScores.sort(Comparator.comparingDouble(TeamScoreResponse::getScore).reversed());
+//		return teamScores;
+//
+//	}
+
+
 
 	public List<TeamScoreResponse> getTeamScores() {
 		List<Implementation> implementations = implementationRepository.findAll();
 		List<TeamScoreResponse> teamScores = new ArrayList<>();
+
+		DecimalFormat df = new DecimalFormat("#.##"); // Specify the number of decimal places you want
+
 		for (Implementation implementation : implementations) {
 			int sum = implementation.getScore().stream().mapToInt(Integer::intValue).sum();
-			Double average= (double) (sum/implementation.getScore().size());
+			double average = ((double) sum / implementation.getScore().size()) * 10; // Scale from 0-10 to 0-100
+
+			// Round the average to 2 decimal places
+			average = Double.parseDouble(df.format(average));
+
 			TeamScoreResponse teamScore = new TeamScoreResponse(implementation.getTeam().getTeamName(), average);
 			teamScores.add(teamScore);
 		}
+
 		teamScores.sort(Comparator.comparingDouble(TeamScoreResponse::getScore).reversed());
 		return teamScores;
-
 	}
 
 
