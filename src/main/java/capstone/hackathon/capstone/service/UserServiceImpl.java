@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import capstone.hackathon.capstone.exceptions.UserNotFoundException;
+import capstone.hackathon.capstone.web.dto.MailMessages;
 import capstone.hackathon.capstone.web.dto.OtpUtil;
 import capstone.hackathon.capstone.web.dto.ResetPasswordDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,17 +58,37 @@ public class UserServiceImpl implements UserService{
 		// TODO Auto-generated method stub
 		System.out.println(registrationDto.toString());
 		String otp=otpUtil.generateOtp();
-		emailService.sendMail(
-				registrationDto.getEmail(),
-				"iHackathon Email Verification OTP",
-				"   Dear " + registrationDto.getFirstName() + ",\n\n" +
-						"   Welcome to iHackathon! We're excited to have you on board. Before you can get started, we need to verify your email address.\n\n" +
-						"   Please use the following OTP to verify your email address:\n" + otp + "\n\n" +
-						"   Once your email address is verified, you'll be able to log in and start exploring the platform.\n\n" +
-						"   If you didn't request this OTP, please ignore this email.\n\n" +
-						"   Regards,\n" +
-						"   Team iHackathon"
-		);
+
+
+
+
+
+		ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+		emailExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					MailMessages mailMessages=new MailMessages();
+					emailService.sendMail(
+							registrationDto.getEmail(),
+							"iHackathon Email Verification OTP",
+							"   Dear " + registrationDto.getFirstName() + ",\n\n" +
+									"   Welcome to iHackathon! We're excited to have you on board. Before you can get started, we need to verify your email address.\n\n" +
+									"   Please use the following OTP to verify your email address:\n" + otp + "\n\n" +
+									"   Once your email address is verified, you'll be able to log in and start exploring the platform.\n\n" +
+									"   If you didn't request this OTP, please ignore this email.\n\n" +
+									"   Regards,\n" +
+									"   Team iHackathon"
+					);
+
+				} catch (Exception e) {
+					System.out.println("failed" + e);
+				}
+			}
+		});
+		emailExecutor.shutdown();
+
+
 
 
 		Role role= new Role("Role_User");

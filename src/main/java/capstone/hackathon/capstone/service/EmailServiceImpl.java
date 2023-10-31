@@ -6,9 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
+
 @Service
+
+
 public class EmailServiceImpl implements EmailService {
 
     @Value("${spring.mail.username}")
@@ -16,6 +21,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender javaMailSender;
+
     @Override
     public String sendMail(String to, String subject, String body) {
         try {

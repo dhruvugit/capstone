@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @CrossOrigin("*")
 
 @RestController
@@ -47,16 +50,32 @@ public class PanelistController {
         if(assignedIdea!=null) assignmentService.updateAssignedIdeaStatus(assignedIdea,status);
         ideaService.updateIdeaStatus(ideaId, status);
         Idea idea=is.findByIdeaId(ideaId);
-        if(idea!=null)
-        {
-            Team team=idea.getTeam();
-            User leader= userService.findByUserId(team.getLeaderId());
-            MailMessages mailMessages= new MailMessages();
-            if(status=="Rejected")
-                emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaRejection);
-            if(status=="Approved")
-                emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaSelection);
-        }
+
+
+        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+        emailExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if(idea!=null)
+                    {
+                        Team team=idea.getTeam();
+                        User leader= userService.findByUserId(team.getLeaderId());
+                        MailMessages mailMessages= new MailMessages();
+                        if(status=="Rejected")
+                            emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaRejection);
+                        if(status=="Approved")
+                            emailService.sendMail(leader.getUserEmail(), "iHackathon Round 1 result",mailMessages.ideaSelection);
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("failed" + e);
+                }
+            }
+        });
+        emailExecutor.shutdown();
+
+
         return ResponseEntity.ok("Idea status updated successfully");
     }
 

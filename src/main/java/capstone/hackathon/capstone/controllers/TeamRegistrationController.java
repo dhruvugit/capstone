@@ -13,6 +13,10 @@ import capstone.hackathon.capstone.service.TeamService;
 import capstone.hackathon.capstone.service.UserService;
 import capstone.hackathon.capstone.web.dto.RegisterTeamDto;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @CrossOrigin("*")
 
 @RestController
@@ -47,14 +51,30 @@ public class TeamRegistrationController {
 			teamService.deleteById(team.getTeamId());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
-		MailMessages mailMessages=new MailMessages();
-		emailService.sendMail(registerTeamDto.getLeaderEmail(),"Team registered",mailMessages.getTeamRegistration());
-		if(registerTeamDto.getMember1Email()!="")
-			emailService.sendMail(registerTeamDto.getMember1Email(),"Team registered",mailMessages.getTeamRegistration());
-		if(registerTeamDto.getMember2Email()!="")
-			emailService.sendMail(registerTeamDto.getMember2Email(),"Team registered",mailMessages.getTeamRegistration());
-		if(registerTeamDto.getMember3Email()!="")
-			emailService.sendMail(registerTeamDto.getMember3Email(),"Team registered",mailMessages.getTeamRegistration());
+//		MailMessages mailMessages=new MailMessages();
+
+
+
+		ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+		emailExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					MailMessages mailMessages=new MailMessages();
+					emailService.sendMail(registerTeamDto.getLeaderEmail(),"Team registered",mailMessages.getTeamRegistration());
+
+					if(registerTeamDto.getMember1Email()!="")
+						emailService.sendMail(registerTeamDto.getMember1Email(),"Team registered",mailMessages.getTeamRegistration());
+					if(registerTeamDto.getMember2Email()!="")
+						emailService.sendMail(registerTeamDto.getMember2Email(),"Team registered",mailMessages.getTeamRegistration());
+					if(registerTeamDto.getMember3Email()!="")
+						emailService.sendMail(registerTeamDto.getMember3Email(),"Team registered",mailMessages.getTeamRegistration());
+				} catch (Exception e) {
+					System.out.println("failed" + e);
+				}
+			}
+		});
+		emailExecutor.shutdown();
 
 		return ResponseEntity.status(HttpStatus.CREATED).body("Team and members registered successfully");
     }

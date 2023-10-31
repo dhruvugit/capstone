@@ -52,6 +52,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or invalid request");
     }
 
+    @PreAuthorize("hasAuthority('Role_Admin')" )
     @GetMapping("/getPanelists")
     public List<User> getPanelists()
     {

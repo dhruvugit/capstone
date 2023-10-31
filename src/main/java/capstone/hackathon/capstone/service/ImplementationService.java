@@ -2,6 +2,8 @@ package capstone.hackathon.capstone.service;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import capstone.hackathon.capstone.entities.User;
@@ -9,6 +11,7 @@ import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.web.dto.AddScoreDto;
 import capstone.hackathon.capstone.web.dto.ImplementationDto;
 
+import capstone.hackathon.capstone.web.dto.MailMessages;
 import capstone.hackathon.capstone.web.dto.TeamScoreResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -195,13 +198,30 @@ public class ImplementationService implements IfImplementationService{
 
 			// Send feedback via email to the leader
 			// Send the feedback via email to the leader
-			User user= userService.findByUserId(implementation.getTeam().getLeaderId());
-			String leaderEmail = user.getUserEmail();
-			String strengthFeedback = addScoreDto.getStrengthFeedback();
-			String weaknessFeedback = addScoreDto.getImprovementAreaFeedback();
-			String developmentFeedback = addScoreDto.getDevelopmentRecommendationsFeedback();
 
-			sendFeedbackEmail(leaderEmail, strengthFeedback, weaknessFeedback, developmentFeedback);
+
+			ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+			emailExecutor.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						User user= userService.findByUserId(implementation.getTeam().getLeaderId());
+						String leaderEmail = user.getUserEmail();
+						String strengthFeedback = addScoreDto.getStrengthFeedback();
+						String weaknessFeedback = addScoreDto.getImprovementAreaFeedback();
+						String developmentFeedback = addScoreDto.getDevelopmentRecommendationsFeedback();
+
+						sendFeedbackEmail(leaderEmail, strengthFeedback, weaknessFeedback, developmentFeedback);
+
+					} catch (Exception e) {
+						System.out.println("failed" + e);
+					}
+				}
+			});
+			emailExecutor.shutdown();
+
+
+
 		} else {
 			throw new ImplementationNotFoundException("No implementation found for ID: " + implementationId);
 		}
