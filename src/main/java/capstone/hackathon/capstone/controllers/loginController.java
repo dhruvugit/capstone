@@ -1,8 +1,7 @@
 package capstone.hackathon.capstone.controllers;
 import capstone.hackathon.capstone.repository.UserRepository;
 import capstone.hackathon.capstone.service.EmailService;
-import capstone.hackathon.capstone.web.dto.LoginResponse;
-import capstone.hackathon.capstone.web.dto.OtpUtil;
+import capstone.hackathon.capstone.web.dto.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
@@ -15,10 +14,10 @@ import org.springframework.http.HttpStatus;
 
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.service.UserService;
-import capstone.hackathon.capstone.web.dto.LoginRequestDto;
-import capstone.hackathon.capstone.web.dto.ResetPasswordDto;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @CrossOrigin("*")
 @RestController
@@ -86,9 +85,25 @@ public class loginController {
 		user.setOtpGeneratedTime(LocalDateTime.now());
 		userRepository.save(user);
 
-		emailService.sendMail(user.getUserEmail(), "Reset Password OTP", "The OTP to reset your password is " + otp);
+
+
+		ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+		emailExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					emailService.sendMail(user.getUserEmail(), "Reset Password OTP", "The OTP to reset your password is " + otp);} catch (Exception e) {
+					System.out.println("failed" + e);
+				}
+			}
+		});
+		emailExecutor.shutdown();
+
 
 		return ResponseEntity.ok("OTP sent to your email. Please reset your password within 2 minutes.");
+
+
+
 	}
 
 	@PostMapping("/resetPassword")

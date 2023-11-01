@@ -226,11 +226,28 @@ public class UserServiceImpl implements UserService{
 		if(user==null) return "User not found, Please enter registered email.";
 		String otp=otpUtil.generateOtp();
 
-		emailService.sendMail(email,"Email verification OTP","The OTP for email verification is "+otp);
-		user.setOtp(otp);
-		user.setOtpGeneratedTime(LocalDateTime.now());
-		userRepository.save(user);
+
+		ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+		emailExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					MailMessages mailMessages=new MailMessages();
+					emailService.sendMail(email,"Email verification OTP","The OTP for email verification is "+otp);
+					user.setOtp(otp);
+					user.setOtpGeneratedTime(LocalDateTime.now());
+					userRepository.save(user);
+
+				} catch (Exception e) {
+					System.out.println("failed" + e);
+				}
+			}
+		});
+		emailExecutor.shutdown();
+
 		return "OTP sent on your email. Please verify within 2 minutes. After that OTP will not be valid.";
+
+
 	}
 
 

@@ -8,12 +8,16 @@ import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.service.*;
 import capstone.hackathon.capstone.web.dto.MailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,6 +46,8 @@ public class PanelistController {
     public List<Idea> getNullStatusIdeas() {
         return ideaService.getNullStatusIdeas();
     }
+
+
 
 
     @PostMapping("/updateStatus")
@@ -80,12 +86,20 @@ public class PanelistController {
     }
 
     @GetMapping("/viewIdeas")
-    public List<Idea> viewIdeas()
+    public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames()
     {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
         List<Idea> ideas= assignmentService.getByPanelistId(user.getId());
-        return ideas;
+        List<Map<String, Object>> ideaResponses = new ArrayList<>();
+        for (Idea idea : ideas) {
+            Team team = idea.getTeam();
+            String teamName = team != null ? team.getTeamName() : null;
+            Map<String, Object> response = new HashMap<>();
+            response.put("idea", idea);
+            response.put("teamName", teamName);
+            ideaResponses.add(response);
+        }
+        return new ResponseEntity<>(ideaResponses, HttpStatus.OK);
     }
 }

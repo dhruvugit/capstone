@@ -6,6 +6,7 @@ import capstone.hackathon.capstone.entities.Role;
 import capstone.hackathon.capstone.service.AssignmentService;
 import capstone.hackathon.capstone.service.EmailService;
 import capstone.hackathon.capstone.service.IdeaService;
+import capstone.hackathon.capstone.web.dto.MailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,15 @@ import capstone.hackathon.capstone.web.dto.UserRoleRequestDto;
 import java.util.List;
 import java.util.*;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private IdeaService ideaService;
@@ -60,10 +64,14 @@ public class AdminController {
         return panelist;
     }
 
+    private int check = 0;
+    @PreAuthorize("hasAuthority('Role_Admin')" )
     @GetMapping("/assignIdeasToPanelists")
     public ResponseEntity<String> assignIdeas()
     {
+        if (check!=0){return ResponseEntity.badRequest().body("Ideas have already been assigned once");}
         String response=assignmentService.assignIdeas();
+        check++;
         return ResponseEntity.ok(response);
     }
 
@@ -85,7 +93,7 @@ public class AdminController {
 //        } else {
 //            return ResponseEntity.notFound().build();
 //        }
-//	}
+//  }
 
 
 
@@ -107,24 +115,43 @@ public class AdminController {
 
     @GetMapping("/sendReminderToPanelists")
     public ResponseEntity<String>sendReminder(){
-    List<User> panelists= userService.getAllPanelists();
-    for(User panelist:panelists)
-    {
-        emailService.sendMail(
-                panelist.getUserEmail(),
-                "Reminder: Pending Idea Evaluations",
-                "Dear " + panelist.getFirstName() + ",\n\n" +
-                        "We hope this message finds you well.\n\n" +
-                        "This is a friendly reminder to complete your pending idea evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
-                        "Please ensure that you finish the evaluations before the deadline.\n\n" +
-                        "Thank you for your time and contribution!\n\n" +
-                        "Best regards,\n" +
-                        "Team iHackathon"
-        );
+        List<User> panelists= userService.getAllPanelists();
 
+
+
+
+        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+        emailExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for(User panelist:panelists) {
+                        emailService.sendMail(
+                                panelist.getUserEmail(),
+                                "Reminder: Pending Idea Evaluations",
+                                "Dear " + panelist.getFirstName() + ",\n\n" +
+                                        "We hope this message finds you well.\n\n" +
+                                        "This is a friendly reminder to complete your pending idea evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
+                                        "Please ensure that you finish the evaluations before the deadline.\n\n" +
+                                        "Thank you for your time and contribution!\n\n" +
+                                        "Best regards,\n" +
+                                        "Team iHackathon"
+                        );
+                    }
+                } catch (Exception e) {
+                    System.out.println("failed" + e);
+                }
+            }
+        });
+        emailExecutor.shutdown();
+
+
+
+
+
+
+        return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
     }
-    return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
-}
 
 
 
@@ -132,21 +159,32 @@ public class AdminController {
     @GetMapping("/sendReminderToJudges")
     public ResponseEntity<String>sendRemindertoJudge(){
         List<User> judges= userService.getAllJudges();
-        for(User judge:judges)
-        {
-            emailService.sendMail(
-                    judge.getUserEmail(),
-                    "Reminder: Pending Idea Evaluations",
-                    "Dear " + judge.getFirstName() + ",\n\n" +
-                            "We hope this message finds you well.\n\n" +
-                            "This is a friendly reminder to complete your pending idea implementation evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
-                            "Please ensure that you finish the evaluations before the deadline.\n\n" +
-                            "Thank you for your time and contribution!\n\n" +
-                            "Best regards,\n" +
-                            "Team iHackathon"
-            );
+        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+        emailExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for(User judge:judges) {
+                        emailService.sendMail(
+                                judge.getUserEmail(),
+                                "Reminder: Pending Idea Evaluations",
+                                "Dear " + judge.getFirstName() + ",\n\n" +
+                                        "We hope this message finds you well.\n\n" +
+                                        "This is a friendly reminder to complete your pending idea implementation evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
+                                        "Please ensure that you finish the evaluations before the deadline.\n\n" +
+                                        "Thank you for your time and contribution!\n\n" +
+                                        "Best regards,\n" +
+                                        "Team iHackathon"
+                        );
+                    }
+                } catch (Exception e) {
+                    System.out.println("failed" + e);
+                }
+            }
+        });
+        emailExecutor.shutdown();
 
-        }
+
         return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
     }
 
@@ -174,9 +212,13 @@ public class AdminController {
         List<AssignedIdeas> assignedIdeas=assignmentService.findAssignedIdeasByPanelistId(panelist.getId());
         for(AssignedIdeas idea:assignedIdeas)
         {
+            if(idea.getStatus()!=null) continue;
             Idea i=ideaService.getIdeaById(idea.getIdeaId());
+
             ideas.add(i);
         }
+        System.out.println(panelists);
+        System.out.println(ideas);
         assignmentService.assignmentAlgorithm(panelists,ideas);
         return ResponseEntity.ok("Ideas have been assigned to the rest of the panelists.");
     }

@@ -45,11 +45,11 @@ public class AssignmentService {
 
             // Assign an equal share of ideas to each panelist
             for (int i = 0; i < ideasPerPanelist; i++) {
-                AssignedIdeas alreadyAssignedIdeas= findByIdeaId(ideas.get(ideaIndex).getId());
-                if(alreadyAssignedIdeas!=null){
-                    ideaIndex++;
-                    continue;
-                }
+//                AssignedIdeas alreadyAssignedIdeas= findByIdeaId(ideas.get(ideaIndex).getId());
+//                if(alreadyAssignedIdeas!=null){
+//                    ideaIndex++;
+//                    continue;
+//                }
                 AssignedIdeas assignedIdeas=new AssignedIdeas(panelist.getId(),ideas.get(ideaIndex).getId());
                 assignedIdeasRepository.save(assignedIdeas);
                 ideaIndex++;
