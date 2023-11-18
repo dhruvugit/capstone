@@ -5,11 +5,14 @@ import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.repository.AssignedIdeasRepository;
 import capstone.hackathon.capstone.repository.IdeaRepository;
+import capstone.hackathon.capstone.web.dto.MailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class AssignmentService {
@@ -24,12 +27,30 @@ public class AssignmentService {
     private AssignedIdeasRepository assignedIdeasRepository;
     @Autowired
     private IdeaRepository ideaRepository;
+//    public String assignIdeas()
+//    {
+//        List<User> panelists=userService.getAllPanelists();
+//        List<Idea> ideas=ideaService.getIdeas();
+//        assignmentAlgorithm(panelists,ideas);
+//        return "Ideas have been assigned to the panelists successfully!";
+//    }
+
+    private boolean assignmentDone = false;
     public String assignIdeas()
     {
+        if(assignmentDone) return "The ideas have already been assigned to the panelists";
+
         List<User> panelists=userService.getAllPanelists();
         List<Idea> ideas=ideaService.getIdeas();
         assignmentAlgorithm(panelists,ideas);
+        assignmentDone=true;
         return "Ideas have been assigned to the panelists successfully!";
+    }
+
+    public String removeAllAssignedIdeas() {
+        assignedIdeasRepository.deleteAll();
+        assignmentDone=false;
+        return "All Ideas have been Unassigned! ";
     }
 
     public void assignmentAlgorithm(List<User> panelists, List<Idea> ideas) {
@@ -65,17 +86,31 @@ public class AssignmentService {
             }
 
             // Set the assigned ideas for this panelist
-            emailService.sendMail(panelist.getUserEmail(),
-                    "Ideas Assigned for Evaluation",
-                    "Dear " + panelist.getFirstName() + ",\n\n" +
-                            "We hope this message finds you well.\n\n" +
-                            "We are pleased to inform you that a set of ideas have been assigned to you for evaluation. We kindly request you to evaluate these ideas in a timely manner. Please consider the following points while evaluating:\n" +
-                            "Your valuable feedback is essential for us to make informed decisions. Please provide clear and constructive feedback for each idea, including any strengths, weaknesses, and potential areas for improvement.\n\n" +
-                            "We appreciate your prompt attention to this matter.\n\n" +
-                            "If you encounter any challenges or have any questions during the evaluation process, please do not hesitate to reach out to us.\n\n" +
-                            "Regards,\n" +
-                            "Team iHackathon"
-                            );
+
+
+
+            ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+            emailExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        emailService.sendMail(panelist.getUserEmail(),
+                                "Ideas Assigned for Evaluation",
+                                "Dear " + panelist.getFirstName() + ",\n\n" +
+                                        "We hope this message finds you well.\n\n" +
+                                        "We are pleased to inform you that a set of ideas have been assigned to you for evaluation. We kindly request you to evaluate these ideas in a timely manner. Please consider the following points while evaluating:\n" +
+                                        "Your valuable feedback is essential for us to make informed decisions. Please provide clear and constructive feedback for each idea, including any strengths, weaknesses, and potential areas for improvement.\n\n" +
+                                        "We appreciate your prompt attention to this matter.\n\n" +
+                                        "If you encounter any challenges or have any questions during the evaluation process, please do not hesitate to reach out to us.\n\n" +
+                                        "Regards,\n" +
+                                        "Team iHackathon"
+                        );
+                    } catch (Exception e) {
+                        System.out.println("failed" + e);
+                    }
+                }
+            });
+            emailExecutor.shutdown();
 
 
 
@@ -131,6 +166,44 @@ public class AssignmentService {
         return assignedIdeasRepository.findByPanelistId(id);
     }
 
+
+    public void removeIdeasAssignedToPanelist(Long id)
+    {
+        List<AssignedIdeas> ideas=assignedIdeasRepository.findByPanelistId(id);
+        for(AssignedIdeas i:ideas)
+        {
+            assignedIdeasRepository.delete(i);
+        }
+    }
+
+
+    public String assignIndividualIdea(int ideaId, String panelistEmail) {
+        Optional<AssignedIdeas> op=assignedIdeasRepository.findByIdeaId(ideaId);
+        if(!op.isEmpty())
+        {
+            AssignedIdeas idea=op.get();
+            User panelist=userService.findByUserEmail(panelistEmail);
+            if(panelist==null)
+            {
+                return "Panelist not found";
+            }
+            idea.setPanelistId(panelist.getId());
+            assignedIdeasRepository.delete(op.get());
+            assignedIdeasRepository.save(idea);
+        }
+        else
+        {
+            User panelist=userService.findByUserEmail(panelistEmail);
+            if(panelist==null)
+            {
+                return "Panelist not found";
+            }
+            AssignedIdeas i= new AssignedIdeas(panelist.getId(),ideaId);
+            assignedIdeasRepository.save(i);
+
+        }
+        return "Idea has been assigned to the panelist.";
+    }
 
 
 

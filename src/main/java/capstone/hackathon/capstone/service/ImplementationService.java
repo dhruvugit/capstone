@@ -6,15 +6,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import capstone.hackathon.capstone.entities.JudgeScore;
 import capstone.hackathon.capstone.entities.User;
+import capstone.hackathon.capstone.repository.JudgeScoreRepository;
 import capstone.hackathon.capstone.security.UserInfoUserDetails;
-import capstone.hackathon.capstone.web.dto.AddScoreDto;
-import capstone.hackathon.capstone.web.dto.ImplementationDto;
+import capstone.hackathon.capstone.web.dto.*;
 
-import capstone.hackathon.capstone.web.dto.MailMessages;
-import capstone.hackathon.capstone.web.dto.TeamScoreResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -29,6 +30,9 @@ import jakarta.transaction.Transactional;
 
 @Service("implementationService")
 public class ImplementationService implements IfImplementationService{
+
+	@Autowired
+	private JudgeScoreRepository judgeScoreRepository;
 	@Autowired 
 	ImplementationRepository implementationRepository;
 	TeamRepository teamRepository;
@@ -177,8 +181,64 @@ public class ImplementationService implements IfImplementationService{
 
 
 
+//	@Override
+//	public void addScores(AddScoreDto addScoreDto) {
+//		String implementationId = addScoreDto.getImplementationId();
+//
+//		Implementation implementation = implementationRepository.findById(Integer.parseInt(implementationId)).orElse(null);
+//
+//		if (implementation != null) {
+//			int strengthScore = addScoreDto.getTechnicalProficiencyScore();
+//			int weaknessScore = addScoreDto.getPresentationAndCommunicationScore();
+//			int developmentScore = addScoreDto.getCreativityAndInnovationScore();
+//
+//			// Add scores to the list
+//			implementation.getScore().add(strengthScore);
+//			implementation.getScore().add(weaknessScore);
+//			implementation.getScore().add(developmentScore);
+//
+//			// Save the implementation
+//			implementationRepository.save(implementation);
+//
+//			// Send feedback via email to the leader
+//			// Send the feedback via email to the leader
+//
+//
+//			ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+//			emailExecutor.execute(new Runnable() {
+//				@Override
+//				public void run() {
+//					try {
+//						User user= userService.findByUserId(implementation.getTeam().getLeaderId());
+//						String leaderEmail = user.getUserEmail();
+//						String strengthFeedback = addScoreDto.getStrengthFeedback();
+//						String weaknessFeedback = addScoreDto.getImprovementAreaFeedback();
+//						String developmentFeedback = addScoreDto.getDevelopmentRecommendationsFeedback();
+//
+//						sendFeedbackEmail(leaderEmail, strengthFeedback, weaknessFeedback, developmentFeedback);
+//
+//					} catch (Exception e) {
+//						System.out.println("failed" + e);
+//					}
+//				}
+//			});
+//			emailExecutor.shutdown();
+//
+//
+//
+//		} else {
+//			throw new ImplementationNotFoundException("No implementation found for ID: " + implementationId);
+//		}
+//	}
+
+
+
+
+
 	@Override
 	public void addScores(AddScoreDto addScoreDto) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserInfoUserDetails judge = (UserInfoUserDetails) authentication.getPrincipal();
 		String implementationId = addScoreDto.getImplementationId();
 
 		Implementation implementation = implementationRepository.findById(Integer.parseInt(implementationId)).orElse(null);
@@ -195,11 +255,11 @@ public class ImplementationService implements IfImplementationService{
 
 			// Save the implementation
 			implementationRepository.save(implementation);
-
+			//Save meta data
+			JudgeScore judgeScore= new JudgeScore(judge.getId(), implementation.getImplementationId(),implementation.getTeam().getTeamName(),addScoreDto.getTechnicalProficiencyScore(), addScoreDto.getPresentationAndCommunicationScore(), addScoreDto.getCreativityAndInnovationScore());
+			judgeScoreRepository.save(judgeScore);
 			// Send feedback via email to the leader
 			// Send the feedback via email to the leader
-
-
 			ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
 			emailExecutor.execute(new Runnable() {
 				@Override
@@ -219,9 +279,6 @@ public class ImplementationService implements IfImplementationService{
 				}
 			});
 			emailExecutor.shutdown();
-
-
-
 		} else {
 			throw new ImplementationNotFoundException("No implementation found for ID: " + implementationId);
 		}
@@ -234,13 +291,31 @@ public class ImplementationService implements IfImplementationService{
 
 	public void sendFeedbackEmail(String leaderEmail, String strengthFeedback, String weaknessFeedback, String developmentFeedback) {
 		// Assuming you have an EmailService with a sendMail method
-		String subject = "Feedback for Implementation";
-		String body = "Strengths: " + strengthFeedback + "\n" +
-				"Improvement Areas: " + weaknessFeedback + "\n" +
-				"Development Recommendations: " + developmentFeedback;
 
-		// Send the email
-		emailService.sendMail(leaderEmail, subject, body);
+
+
+		ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+		emailExecutor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+
+					String subject = "Feedback for Implementation";
+					String body = "Strengths: " + strengthFeedback + "\n" +
+							"Improvement Areas: " + weaknessFeedback + "\n" +
+							"Development Recommendations: " + developmentFeedback;
+
+					// Send the email
+					emailService.sendMail(leaderEmail, subject, body);
+
+				}
+				catch (Exception e) {
+					System.out.println("failed" + e);
+				}
+			}
+		});
+		emailExecutor.shutdown();
+
 	}
 
 
@@ -323,6 +398,22 @@ public class ImplementationService implements IfImplementationService{
 //		teamScores.sort(Comparator.comparingInt(TeamScoreResponse::getScore).reversed());
 //		return teamScores;
 //	}
+
+	public List<JudgeScoreDto> findScoresByJudgeId(Long id)
+	{
+		List<JudgeScoreDto> judgeScoreDtos=new ArrayList<>();
+		List<JudgeScore>judgeScore=judgeScoreRepository.findByJudgeId(id);
+		for(JudgeScore j:judgeScore)
+		{
+			JudgeScoreDto judgeScoreDto=new JudgeScoreDto(j.getTeamName(),j.getTechnicalProficiencyScore(), j.getPresentationAndCommunicationScore(), j.getCreativityAndInnovationScore());
+			judgeScoreDtos.add(judgeScoreDto);
+		}
+		return judgeScoreDtos;
+	}
+
+
+
+
 
 
 

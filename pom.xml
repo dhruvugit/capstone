@@ -13,7 +13,6 @@
 	<groupId>capstone.hackathon</groupId>
 	<artifactId>capstone</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
 	<name>capstone</name>
 	<description>Capstone Project</description>
 	<properties>

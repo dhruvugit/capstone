@@ -24,6 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @CrossOrigin("*")
 @RestController
@@ -196,36 +198,54 @@ public ResponseEntity<List<Map<String, Object>>> getIdeasWithTeamNames() {
                     Long leaderId = team.getLeaderId();
                     User leader = userRepository.findById(leaderId).orElse(null);
 
-                    if (leader != null) {
-                        // Send email to leader of the team
-                        String subject = "Feedback and Status Update";
-                        String message;
 
-                        if (status.equalsIgnoreCase("approved")) {
-                            message = "Congratulations on the approval of your idea!\n\n" +
-                                    "Idea Title: " + idea.getTitle() + "\n" +
-                                    "Feedback: " + feedback + "\n\n" +
-                                    "You have successfully advanced to the next round. Please proceed by submitting " +
-                                    "the implementation details (code, presentation, recording) uploaded on your google drive account.\n\n" +
 
-                                    "Best regards,\n" +
-                                    "Team iHackathon";
-                        } else if (status.equalsIgnoreCase("rejected")) {
-                            message = "We appreciate your effort and creativity!\n\n" +
-                                    "Idea Title: " + idea.getTitle() + "\n" +
-                                    "Feedback: " + feedback + "\n\n" +
-                                    "Although your idea was not selected this time, we encourage you to continue " +
-                                    "innovating and participating in future events. Your ideas have great potential!\n\n" +
-                                    "Best regards,\n" +
-                                    "Team iHackathon";
-                        } else {
-                            message = "Idea Title: " + idea.getTitle() + "\n" +
-                                    "Feedback: " + feedback + "\n\n" +
-                                    "Status: " + status;
+
+
+                    ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+                    emailExecutor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+
+                                if (leader != null) {
+                                    // Send email to leader of the team
+                                    String subject = "Feedback and Status Update";
+                                    String message;
+
+                                    if (status.equalsIgnoreCase("approved")) {
+                                        message = "Congratulations on the approval of your idea!\n\n" +
+                                                "Idea Title: " + idea.getTitle() + "\n" +
+                                                "Feedback: " + feedback + "\n\n" +
+                                                "You have successfully advanced to the next round. Please proceed by submitting " +
+                                                "the implementation details (code, presentation, recording) uploaded on your google drive account.\n\n" +
+
+                                                "Best regards,\n" +
+                                                "Team iHackathon";
+                                    } else if (status.equalsIgnoreCase("rejected")) {
+                                        message = "We appreciate your effort and creativity!\n\n" +
+                                                "Idea Title: " + idea.getTitle() + "\n" +
+                                                "Feedback: " + feedback + "\n\n" +
+                                                "Although your idea was not selected this time, we encourage you to continue " +
+                                                "innovating and participating in future events. Your ideas have great potential!\n\n" +
+                                                "Best regards,\n" +
+                                                "Team iHackathon";
+                                    } else {
+                                        message = "Idea Title: " + idea.getTitle() + "\n" +
+                                                "Feedback: " + feedback + "\n\n" +
+                                                "Status: " + status;
+                                    }
+
+                                    emailService.sendMail(leader.getUserEmail(), subject, message);
+                                }
+
+                            }
+                            catch (Exception e) {
+                                System.out.println("failed" + e);
+                            }
                         }
-
-                        emailService.sendMail(leader.getUserEmail(), subject, message);
-                    }
+                    });
+                    emailExecutor.shutdown();
 
                     response = new ResponseEntity<>("Status updated successfully. Email sent.", HttpStatus.OK);
                 } else {
