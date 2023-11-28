@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService{
 	public String verifyEmail(String email, String otp) {
 		User user =findByUserEmail(email);
 		if(user==null) return "User not found, Please enter registered email.";
-		if(user.getOtp().equals(otp) && Duration.between(user.getOtpGeneratedTime(), LocalDateTime.now()).getSeconds()<(2*60)){
+		if(user.getOtp().equals(otp) && Duration.between(user.getOtpGeneratedTime(), LocalDateTime.now()).getSeconds()<(5*60)){
 			user.setActive(true);
 			userRepository.save(user);
 			return "OTP verified successfully. You can now login";

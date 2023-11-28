@@ -120,6 +120,12 @@ public class AssignmentService {
 
     }
 
+
+
+
+
+
+
     public void updateAssignedIdeaStatus(AssignedIdeas assignedIdeas, String status){
         assignedIdeas.setStatus(status);
         assignedIdeasRepository.save(assignedIdeas);

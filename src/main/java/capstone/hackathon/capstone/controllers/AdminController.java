@@ -174,11 +174,8 @@ public class AdminController {
             }
         });
         emailExecutor.shutdown();
-
-
         return ResponseEntity.ok("Reminder Sent to the panelists successfully!");
     }
-
 
     @GetMapping("/checkPanelistProgress")
     public List<AssignedIdeas> checkPanelistProgress(String panelistEmail) {
@@ -194,6 +191,7 @@ public class AdminController {
     public ResponseEntity<String> assignIdeasToOtherPanelists(@RequestParam String panelistEmail)
     {   //userService.removeRoleFromUserByEmail(panelistEmail, "Role_Panelist");
         List<User> panelists=userService.getAllPanelists();
+        panelists.remove(userService.findByUserEmail(panelistEmail));
         List<Idea> ideas=new ArrayList<>();
         User panelist= userService.findByUserEmail(panelistEmail);
         List<AssignedIdeas> assignedIdeas=assignmentService.findAssignedIdeasByPanelistId(panelist.getId());
@@ -201,7 +199,6 @@ public class AdminController {
         {
             if(idea.getStatus()!=null) continue;
             Idea i=ideaService.getIdeaById(idea.getIdeaId());
-
             ideas.add(i);
         }
         assignmentService.assignmentAlgorithm(panelists,ideas);
