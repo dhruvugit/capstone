@@ -5,6 +5,7 @@ import capstone.hackathon.capstone.entities.Idea;
 import capstone.hackathon.capstone.entities.User;
 import capstone.hackathon.capstone.repository.AssignedIdeasRepository;
 import capstone.hackathon.capstone.repository.IdeaRepository;
+import capstone.hackathon.capstone.repository.UserRepository;
 import capstone.hackathon.capstone.web.dto.MailMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,9 +14,13 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignmentService {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private EmailService emailService;
@@ -53,42 +58,41 @@ public class AssignmentService {
         return "All Ideas have been Unassigned! ";
     }
 
+
+
+
+
     public void assignmentAlgorithm(List<User> panelists, List<Idea> ideas) {
+
+        List<User> activePanelists = panelists.stream()
+                .filter(panelist -> !"lazy".equals(panelist.getPanelistStatus()))
+                .collect(Collectors.toList());
 
         Collections.shuffle(ideas, new Random());
 
-        int ideasPerPanelist = ideas.size() / panelists.size();
-        int remainingIdeas = ideas.size() % panelists.size();
+        int ideasPerPanelist = ideas.size() / activePanelists.size();
+        int remainingIdeas = ideas.size() % activePanelists.size();
 
         int ideaIndex = 0;
 
-        for (User panelist : panelists) {
-
+        for (User panelist : activePanelists) {
             // Assign an equal share of ideas to each panelist
             for (int i = 0; i < ideasPerPanelist; i++) {
-//                AssignedIdeas alreadyAssignedIdeas= findByIdeaId(ideas.get(ideaIndex).getId());
-//                if(alreadyAssignedIdeas!=null){
-//                    ideaIndex++;
-//                    continue;
-//                }
-                AssignedIdeas assignedIdeas=new AssignedIdeas(panelist.getId(),ideas.get(ideaIndex).getId());
+                AssignedIdeas assignedIdeas = new AssignedIdeas(panelist.getId(), ideas.get(ideaIndex).getId());
                 assignedIdeasRepository.save(assignedIdeas);
                 ideaIndex++;
             }
 
             // Distribute any remaining ideas equally among panelists
             if (remainingIdeas > 0) {
-                //assign
-                AssignedIdeas assignedIdeas=new AssignedIdeas(panelist.getId(),ideas.get(ideaIndex).getId());
+                AssignedIdeas assignedIdeas = new AssignedIdeas(panelist.getId(), ideas.get(ideaIndex).getId());
                 assignedIdeasRepository.save(assignedIdeas);
                 ideaIndex++;
                 remainingIdeas--;
             }
 
-            // Set the assigned ideas for this panelist
-
-
-
+            // Sending email remains the same...
+            // ...
             ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
             emailExecutor.execute(new Runnable() {
                 @Override
@@ -111,14 +115,9 @@ public class AssignmentService {
                 }
             });
             emailExecutor.shutdown();
-
-
-
-            // Optionally, you can save this assignment in your database
         }
-
-
     }
+
 
 
 
@@ -173,12 +172,19 @@ public class AssignmentService {
     }
 
 
-    public void removeIdeasAssignedToPanelist(Long id)
-    {
-        List<AssignedIdeas> ideas=assignedIdeasRepository.findByPanelistId(id);
-        for(AssignedIdeas i:ideas)
-        {
-            assignedIdeasRepository.delete(i);
+    public void removeIdeasAssignedToPanelist(Long id) {
+        Optional<User> panelistOptional = userRepository.findById(id);
+
+        if (panelistOptional.isPresent()) {
+            User panelist = panelistOptional.get();
+            panelist.setPanelistStatus("lazy");
+
+            List<AssignedIdeas> ideas = assignedIdeasRepository.findByPanelistId(id);
+            for (AssignedIdeas idea : ideas) {
+                assignedIdeasRepository.delete(idea);
+            }
+
+            userRepository.save(panelist);
         }
     }
 

@@ -203,6 +203,7 @@ public class AdminController {
         }
         assignmentService.assignmentAlgorithm(panelists,ideas);
         assignmentService.removeIdeasAssignedToPanelist(panelist.getId());
+
         return ResponseEntity.ok("Ideas have been assigned to the rest of the panelists.");
     }
     @GetMapping("/getPanelistsDetails")

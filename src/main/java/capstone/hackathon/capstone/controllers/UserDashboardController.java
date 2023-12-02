@@ -209,6 +209,7 @@ public class UserDashboardController {
                         Map<String, Object> teamDetails = new HashMap<>();
                         teamDetails.put("leader", leader);
                         teamDetails.put("members", members);
+                        teamDetails.put("teamCode",optionalTeam.get().teamCode);
 
                         return ResponseEntity.ok(teamDetails);
                     } else {
@@ -239,6 +240,7 @@ public class UserDashboardController {
                     Map<String, Object> teamDetails = new HashMap<>();
                     teamDetails.put("leader", leader);
                     teamDetails.put("members", members);
+                    teamDetails.put("teamCode",optionalTeam.get().teamCode);
 
                     return ResponseEntity.ok(teamDetails);
                 } else {

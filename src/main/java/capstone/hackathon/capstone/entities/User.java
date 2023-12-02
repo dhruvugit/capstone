@@ -21,6 +21,8 @@ public class User {
 	private String otp;
 	private LocalDateTime otpGeneratedTime;
 
+	private String panelistStatus;
+
 	public LocalDateTime getOtpGeneratedTime() {
 		return otpGeneratedTime;
 	}
@@ -124,7 +126,12 @@ public class User {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
 
-	
+	public String getPanelistStatus() {
+		return panelistStatus;
+	}
+
+	public void setPanelistStatus(String panelistStatus) {
+		this.panelistStatus = panelistStatus;
+	}
 }

@@ -1,27 +1,41 @@
 package capstone.hackathon.capstone.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name="TEAM_DETAILS")
+@Table(name="TEAM_DETAILS",uniqueConstraints = @UniqueConstraint(columnNames = "TeamCode"))
 public class Team {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long teamId;
 	private String teamName;
+	private String teamSummary;
+
+	public String getTeamSummary() {
+		return teamSummary;
+	}
+	@Column(name = "teamCode")
+	public String teamCode;
+
+
+	public String getTeamCode() {
+		return teamCode;
+	}
+
+	public void setTeamCode(String teamCode) {
+		this.teamCode = teamCode;
+	}
+
+	public void setTeamSummary(String teamSummary) {
+		this.teamSummary = teamSummary;
+	}
+
 	private long leaderId;
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "team")
-	 private Implementation implementation;
+	private Implementation implementation;
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "team")
@@ -50,9 +64,10 @@ public class Team {
 		this.implementation = implementation;
 	}
 
-	public Team(long teamId, String teamName, long leaderId, Implementation implementation, Idea idea) {
-		this.teamId = teamId;
+	public Team(String teamName, String teamSummary, String teamCode, long leaderId, Implementation implementation, Idea idea) {
 		this.teamName = teamName;
+		this.teamSummary = teamSummary;
+		this.teamCode = teamCode;
 		this.leaderId = leaderId;
 		this.implementation = implementation;
 		this.idea = idea;
@@ -67,6 +82,8 @@ public class Team {
 		return "Team{" +
 				"teamId=" + teamId +
 				", teamName='" + teamName + '\'' +
+				", teamSummary='" + teamSummary + '\'' +
+				", TeamCode='" + teamCode + '\'' +
 				", leaderId=" + leaderId +
 				", implementation=" + implementation +
 				", idea=" + idea +
@@ -85,7 +102,7 @@ public class Team {
 	public void setLeaderId(long leaderId) {
 		this.leaderId = leaderId;
 	}
-	
-	
-	
+
+
+
 }
