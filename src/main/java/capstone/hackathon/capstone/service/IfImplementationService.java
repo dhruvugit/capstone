@@ -22,8 +22,8 @@ public interface IfImplementationService {
 	public void addScores(AddScoreDto addScoreDto);
 
 	public Implementation submitImplementation(ImplementationDto implementationDto, UserInfoUserDetails user);
-		
-		
+
+	public String judgeStatus(Long judgeId, int implementationId);
 		public Implementation findImplementationByTeamId(Long teamId);
        //public List<Map<String, Object>> getTeamScores();
 	public void updateImplementationFields(Long teamId, String newField1, String newField2,String newField3, String newField4) ;

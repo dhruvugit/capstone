@@ -411,6 +411,16 @@ public class ImplementationService implements IfImplementationService{
 		return judgeScoreDtos;
 	}
 
+	@Override
+	public String judgeStatus(Long judgeId, int implementationId) {
+		List<JudgeScore> judgeScores=judgeScoreRepository.findByJudgeId(judgeId);
+		for(JudgeScore judgeScore: judgeScores)
+		{
+			if(judgeScore.getImplementationId()==implementationId) return "Evaluated";
+		}
+		return "Pending";
+	}
+
 
 
 

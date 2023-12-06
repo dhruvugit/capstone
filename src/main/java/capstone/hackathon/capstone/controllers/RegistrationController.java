@@ -54,8 +54,8 @@ public class RegistrationController {
 			else return new ResponseEntity<>(userService.verifyEmail(email,otp),HttpStatus.OK);
 		}
 		@PutMapping("/regenerate-otp")
-		public ResponseEntity<String> regenerateOtp(@RequestParam String email){
-			return new ResponseEntity<>(userService.regenerateOtp(email),HttpStatus.OK);
+		public ResponseEntity<String> regenerateOtp(@RequestParam String username){
+			return new ResponseEntity<>(userService.regenerateOtp(username),HttpStatus.OK);
 		}
 	
 	

@@ -75,6 +75,9 @@ public class ImplementationController {
     @PreAuthorize("hasAuthority('Role_Leader') or hasAuthority('Role_User') or hasAuthority('Role_Judge')")
     @GetMapping("/implementations")
     public ResponseEntity<List<Map<String, Object>>> fetchAllImplementationsWithTeamNames() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+
         List<Implementation> implementations = implementationService.fetchAllImplementations();
 
         List<Map<String, Object>> implementationResponses = new ArrayList<>();
@@ -89,12 +92,14 @@ public class ImplementationController {
             response.put("implementation", implementation);
             response.put("teamName", teamName);
             response.put("ideaTitle", idea != null ? idea.getTitle() : null);
+            response.put("Status",implementationService.judgeStatus(user.getId(),implementation.getImplementationId()));
 
             implementationResponses.add(response);
         }
 
         return new ResponseEntity<>(implementationResponses, HttpStatus.OK);
     }
+
 
 
 

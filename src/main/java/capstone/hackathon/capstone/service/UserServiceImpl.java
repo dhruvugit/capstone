@@ -221,8 +221,9 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public String regenerateOtp(String email) {
-		User user =findByUserEmail(email);
+	public String regenerateOtp(String username) {
+		User user = findByUsername(username);
+		//User user =findByUserEmail(email);
 		if(user==null) return "User not found, Please enter registered email.";
 		String otp=otpUtil.generateOtp();
 
@@ -233,7 +234,7 @@ public class UserServiceImpl implements UserService{
 			public void run() {
 				try {
 					MailMessages mailMessages=new MailMessages();
-					emailService.sendMail(email,"Email verification OTP","The OTP for email verification is "+otp);
+					emailService.sendMail(user.getUserEmail(),"Email verification OTP","The OTP for email verification is "+otp);
 					user.setOtp(otp);
 					user.setOtpGeneratedTime(LocalDateTime.now());
 					userRepository.save(user);

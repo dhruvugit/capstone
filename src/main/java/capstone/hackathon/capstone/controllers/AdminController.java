@@ -1,24 +1,26 @@
 package capstone.hackathon.capstone.controllers;
 
-import capstone.hackathon.capstone.entities.AssignedIdeas;
-import capstone.hackathon.capstone.entities.Idea;
-import capstone.hackathon.capstone.entities.Role;
+import capstone.hackathon.capstone.entities.*;
+import capstone.hackathon.capstone.repository.IdeaRepository;
+import capstone.hackathon.capstone.repository.JudgeScoreRepository;
 import capstone.hackathon.capstone.repository.UserRepository;
+import capstone.hackathon.capstone.security.UserInfoUserDetails;
 import capstone.hackathon.capstone.service.*;
 import capstone.hackathon.capstone.web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import capstone.hackathon.capstone.entities.User;
 
 import java.util.List;
 import java.util.*;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -26,6 +28,12 @@ import java.util.concurrent.Executors;
 public class AdminController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JudgeScoreRepository judgeScoreRepository;
+
+    @Autowired
+    private IdeaRepository ideaRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -269,27 +277,6 @@ public class AdminController {
     }
 
 
-//    @GetMapping("/sendReminderToIndividualPanelist")
-//    public ResponseEntity<String> sendReminderToIndividualPanelist() {
-//        List<User> panelists = userService.getAllPanelists();
-//        for (User panelist : panelists) {
-//            emailService.sendMail(
-//                    panelist.getUserEmail(),
-//                    "Reminder: Pending Idea Evaluations",
-//                    "Dear " + panelist.getFirstName() + ",\n\n" +
-//                            "We hope this message finds you well.\n\n" +
-//                            "This is a friendly reminder to complete your pending idea implementation evaluations for the hackathon. Your input and feedback are highly valuable.\n\n" +
-//                            "Please ensure that you finish the evaluations before the deadline.\n\n" +
-//                            "Thank you for your time and contribution!\n\n" +
-//                            "Best regards,\n" +
-//                            "Team iHackathon"
-//            );
-//
-//        }
-//        return ResponseEntity.ok("Reminder Sent to the Panelist successfully!");
-//
-//
-//    }
 
 
     @GetMapping("/sendReminderToIndividualPanelist")
@@ -371,13 +358,4 @@ public class AdminController {
         return ResponseEntity.ok(judgeScoreDtos);
 
     }
-
-
-
-
-
-
-
-
-
 }

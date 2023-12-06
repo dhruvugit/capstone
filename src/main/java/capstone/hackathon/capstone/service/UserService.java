@@ -29,5 +29,5 @@ public interface UserService {
 
 	String verifyEmail(String email, String otp);
 
-	String regenerateOtp(String email);
+	String regenerateOtp(String username);
 }
